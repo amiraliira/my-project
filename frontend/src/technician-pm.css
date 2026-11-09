@@ -1,0 +1,34 @@
+.technician-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 20px;padding:6px;border:1px solid #344454;border-radius:14px;background:#18232e}
+.technician-tabs>button{display:flex;align-items:center;justify-content:center;gap:10px;min-width:0;min-height:62px;padding:13px 16px;border:1px solid transparent;border-radius:10px;background:transparent;color:#aebfcc;font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.technician-tabs>button.active{border-color:#3d9f96;background:#194641;color:#bcf7ec;box-shadow:0 2px 9px #0a191b33}
+.technician-tabs>button.has-overdue{color:#f5c18b;border-color:#936541}.technician-tabs>button.has-overdue.active{background:#453525}.technician-tabs>button.has-overdue .technician-tab-count{background:#e4a86b;color:#2d241b}
+.technician-tabs>button:hover{color:#e6f6f2}.technician-tabs>button:focus-visible,.technician-pm-filters>button:focus-visible{outline:2px solid #4bd8c6;outline-offset:3px}
+.technician-tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:25px;height:25px;padding:0 6px;border-radius:8px;background:#39caba;color:#102e2b;font-size:12px}
+.technician-tab-panel[hidden],.technician-pm-inbox[hidden]{display:none!important}.technician-tab-panel{min-width:0}
+.technician-pm-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.technician-pm-heading h2{margin:0 0 8px;font-size:17px;color:#e2edf4}.technician-pm-heading p{margin:0;font-size:12px;color:#aebecb;line-height:2}
+.technician-pm-refresh{display:inline-flex;align-items:center;gap:6px;color:#92cfbe;font-size:10px;line-height:1.9}
+.technician-pm-refresh i{width:7px;height:7px;border-radius:50%;background:#3ccbb4;flex-shrink:0}
+.technician-pm-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 17px}
+.technician-pm-filters>button{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:45px;padding:10px 7px;border:1px solid #3f5263;border-radius:9px;background:#263543;color:#bdcbd5;font:inherit;font-size:12px;cursor:pointer;line-height:1.8}
+.technician-pm-filters>button.active{background:#234940;border-color:#46ab97;color:#bcf2e6}.technician-pm-filters>button>span{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;padding:0 5px;border-radius:6px;background:#122a2e;color:#c7ede4;font-size:11px}
+.technician-pm-overdue-filter{margin:0 0 16px;color:#ebc494;font-size:12px}
+.technician-pm-card{padding:18px;margin-top:12px;border:1px solid #405363;border-radius:11px;background:#24323f;min-width:0}
+.technician-pm-card.overdue{border-color:#966446;background:#332f2b}.technician-pm-card.returned{border-color:#936d48}
+.technician-pm-card-title{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;min-width:0}
+.technician-pm-icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:43px;height:43px;border-radius:10px;background:#18433e;color:#72dfce}
+.technician-pm-card-title>div{min-width:0}.technician-pm-card h3{margin:0 0 5px;color:#e0edf3;font-size:14px;line-height:1.9;overflow-wrap:anywhere}.technician-pm-card p{margin:0;color:#aebfcc;font-size:11px;line-height:2;overflow-wrap:anywhere}
+.technician-pm-card-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0 15px;font-size:12px;color:#bfd0db;line-height:1.9}.technician-pm-card-meta b{font-weight:600;color:#e0eaf0}
+.technician-pm-state{display:inline-flex;padding:4px 9px;border-radius:7px;background:#1c4240;color:#ade9dd;font-size:11px}.technician-pm-card.overdue .technician-pm-state,.technician-pm-card.returned .technician-pm-state{background:#57432b;color:#f3cda1}
+.technician-pm-card p.technician-pm-card-hint{margin:0 0 13px;color:#e4c19c}.technician-pm-card>.button{min-height:43px;gap:9px;font-size:12px}
+.pm-execution-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:13px}.pm-execution-header h2{margin:0 0 8px;line-height:1.9;font-size:17px}.pm-execution-header p{margin:0;color:#b0c7d3;font-size:12px;line-height:2}
+.pm-execution-help{padding:12px 14px;background:#203c40;border:1px solid #3b5e63;border-radius:9px;font-size:12px;color:#bedddc;line-height:2;margin:14px 0}
+.pm-execution-time{border:1px solid #405b6b;border-radius:10px;padding:16px;background:#243542;margin:20px 0 16px;min-width:0}.pm-execution-time h3{font-size:14px;margin:0 0 14px;color:#d5e9ee}.pm-execution-time .pm-execution-row{margin-bottom:13px}
+.pm-execution-footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:8px}.pm-execution-footer .button{min-height:44px}.pm-execution-time .field textarea{line-height:2}
+@media(max-width:600px){
+ .technician-tabs{gap:6px;padding:5px;margin-bottom:16px}.technician-tabs>button{font-size:14px;gap:7px;min-height:58px;padding:11px 7px}.technician-tab-count{height:23px;min-width:23px;font-size:11px}
+ .technician-pm-inbox{padding:17px 13px}.technician-pm-heading{gap:8px}.technician-pm-heading h2{font-size:16px}.technician-pm-heading p{font-size:11px}
+ .technician-pm-filters{gap:5px}.technician-pm-filters>button{font-size:10px;gap:4px;flex-wrap:wrap;padding:9px 5px;min-height:51px}.technician-pm-filters>button>span{font-size:10px;height:21px;min-width:21px}
+ .technician-pm-card{padding:14px 12px}.technician-pm-card-title{gap:9px}.technician-pm-icon{width:35px;height:35px;border-radius:8px}.technician-pm-card h3{font-size:13px}.technician-pm-card>.button{width:100%;justify-content:center;font-size:12px}
+ .technician-pm-card-meta{display:grid;gap:8px;font-size:11px}.technician-pm-state{justify-self:start;white-space:normal}.pm-execution-time{padding:14px 12px}.pm-execution-footer{gap:8px}.pm-execution-footer .button.primary{width:100%;justify-content:center}.pm-execution-footer .button{font-size:12px;flex-grow:1}
+}

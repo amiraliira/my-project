@@ -1,0 +1,25 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+/* Keep the approved form controls while utilities replace layout rules. */
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@source "./";
+
+@theme {
+ --font-sans: Tahoma, "Segoe UI", Arial, sans-serif;
+ --color-pak-background: #161b22;
+ --color-pak-surface: #202935;
+ --color-pak-text: #edf3f7;
+ --color-pak-accent: #35d0bd;
+ --color-pak-border: #354555;
+}
+
+@layer components {
+ .button { @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-55; }
+ .icon-button { @apply inline-flex shrink-0 items-center justify-center rounded-lg; }
+ .table-wrap { @apply max-w-full overflow-x-auto overscroll-x-contain; }
+ .management-shell .panel { @apply border-pak-border bg-pak-surface text-pak-text; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+ *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
