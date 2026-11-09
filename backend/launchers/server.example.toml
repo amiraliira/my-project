@@ -1,0 +1,27 @@
+# PostgreSQL 17+ only. Operator template; never loaded automatically.
+# Replace paths with absolute local paths. Choose one explicit internal numeric IP.
+listen_url = "https://192.168.1.10:5187"
+# Managed Start-Pak overrides frontend_directory in memory with the selected release.
+frontend_directory = "C:/PAK/shared/frontend"
+seed_directory = "C:/PAK/shared/seed"
+backup_directory = "C:/PAK/shared/backups"
+development = false
+scheduling_enabled = true
+company_name = "شرکت لبنیات پاک"
+automatic_backup_enabled = true
+backup_interval_hours = 24
+backup_retention_count = 14
+# Existing IT-managed native tools; this package never installs a DB service.
+postgresql_dump_executable = "C:/Program Files/PostgreSQL/17/bin/pg_dump.exe"
+postgresql_restore_executable = "C:/Program Files/PostgreSQL/17/bin/pg_restore.exe"
+
+[database]
+provider = "postgresql"
+host = "192.168.1.10"
+port = 5432
+database = "pak_maintenance"
+user = "pak_runtime"
+password = ""
+sslmode = "verify-full"
+sslrootcert = "C:/PAK/shared/certificates/database-ca.crt"
+development = false

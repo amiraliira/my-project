@@ -1,0 +1,61 @@
+{
+  "timestampUtc": "2026-11-05T14:53:53.463782+00:00",
+  "syntheticOnly": true,
+  "liveCompanyDataUsed": false,
+  "httpServerStarted": false,
+  "provider": "PostgreSQL disposable TLS fixture",
+  "python": "3.12.14",
+  "os": "Windows 11",
+  "architecture": "AMD64",
+  "logicalCpuCount": 6,
+  "reports": 10000,
+  "parts": 10001,
+  "seedSeconds": 53.815,
+  "measurements": {
+    "orders_page_100": {
+      "iterations": 3,
+      "elapsedMilliseconds": [
+        462.722,
+        428.696,
+        630.826
+      ],
+      "medianMilliseconds": 462.722,
+      "peakPythonBytes": 1475491,
+      "jsonBytes": 180638
+    },
+    "parts_page_100": {
+      "iterations": 3,
+      "elapsedMilliseconds": [
+        157.858,
+        154.394,
+        156.017
+      ],
+      "medianMilliseconds": 156.017,
+      "peakPythonBytes": 177300,
+      "jsonBytes": 18266
+    },
+    "performance_details_100": {
+      "iterations": 3,
+      "elapsedMilliseconds": [
+        250.262,
+        235.156,
+        236.709
+      ],
+      "medianMilliseconds": 236.709,
+      "peakPythonBytes": 329523,
+      "jsonBytes": 38897
+    },
+    "dashboard_recent_20": {
+      "iterations": 3,
+      "elapsedMilliseconds": [
+        258.852,
+        253.175,
+        246.445
+      ],
+      "medianMilliseconds": 253.175,
+      "peakPythonBytes": 378116,
+      "jsonBytes": 43637
+    }
+  },
+  "limits": "In-process router/domain measurements against real isolated PostgreSQL with TLS and tracemalloc; excludes HTTP transport, company LAN latency, concurrent clients and browser rendering. Not a production capacity or speed claim."
+}

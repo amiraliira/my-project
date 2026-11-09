@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pak-maintenance"
+version = "2.0.0rc12"
+description = "Internal-network maintenance and repair management for PAK"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.143.0",
+  "uvicorn==0.54.0",
+  "psycopg[binary]==3.3.6",
+  "tzdata==2026.5",
+  "reportlab==4.4.9",
+  "arabic-reshaper==3.0.1",
+  "python-bidi==0.6.7",
+]
+
+[project.scripts]
+pak-maintenance = "pak_maintenance.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pak_maintenance = ["persian_year_starts.json", "DejaVuSans.ttf", "DejaVuSans-LICENSE.txt"]

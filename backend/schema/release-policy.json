@@ -1,0 +1,14 @@
+{
+  "protocol": 1,
+  "coreSchema": 10,
+  "optionalOeeSchema": 1,
+  "databaseMigration": true,
+  "explicitUpgrades": ["postgresql-upgrade-8-to-9.sql", "postgresql-upgrade-9-to-10.sql"],
+  "maintenanceTools": ["tools/upgrade_core_schema.py", "tools/upgrade_review_schema.py"],
+  "sourceCoreSchema": 8,
+  "requiresStoppedWriters": true,
+  "requiresVerifiedNativeBackup": true,
+  "startupMigrates": false,
+  "preservesExistingRows": true,
+  "optionalOeeMigration": false
+}
