@@ -1,0 +1,52 @@
+{
+  "issue": 1,
+  "description": "Own finalized performance visible in each authenticated inbox",
+  "candidateVersion": "2.0.0-rc.12",
+  "frontend": {
+    "testsPassed": 78,
+    "failures": 0,
+    "typecheck": true,
+    "productionBuild": true,
+    "gzipPairsVerified": 21,
+    "apiVersion": 6,
+    "coreSchemaMinimum": 9,
+    "clientVersion": "2.0.0-rc.12",
+    "requiredCapability": "own-performance",
+    "ownInboxRolesTested": [
+      "technician",
+      "supervisor",
+      "planner",
+      "head",
+      "manager",
+      "admin"
+    ],
+    "personalSummaryAlwaysVisible": true,
+    "personalDetailsInitiallyCollapsed": true,
+    "liveServerContact": false
+  },
+  "backend": {
+    "successful": true,
+    "testsRun": 48,
+    "failures": 0,
+    "errors": 0,
+    "skipped": [
+      {
+        "test": "setUpClass (test_performance_years.PerformanceYearTests)",
+        "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+      }
+    ],
+    "targets": [
+      "test_own_performance",
+      "test_workflow",
+      "test_supervisor_work.SupervisorWorkTests",
+      "test_performance_years",
+      "test_api.RouteTests"
+    ],
+    "companyServerContacted": false,
+    "deployed": false
+  },
+  "schemaFilesIdenticalToRc11": 25,
+  "requiresNewSchemaMigration": false,
+  "companyServerContacted": false,
+  "deployed": false
+}

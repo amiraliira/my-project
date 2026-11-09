@@ -1,0 +1,26 @@
+test_aggregate_is_ratio_of_sums_not_mean_of_percentages (test_oee_metrics.OeeMetricsCase.test_aggregate_is_ratio_of_sums_not_mean_of_percentages) ... ok
+test_all_nontechnical_shift_is_available_under_company_policy (test_oee_metrics.OeeMetricsCase.test_all_nontechnical_shift_is_available_under_company_policy) ... ok
+test_confirmed_zero_production_is_zero_oee_not_missing_data (test_oee_metrics.OeeMetricsCase.test_confirmed_zero_production_is_zero_oee_not_missing_data) ... ok
+test_count_and_runtime_totals_exact_across_shifts_with_confirmed_zero (test_oee_metrics.OeeMetricsCase.test_count_and_runtime_totals_exact_across_shifts_with_confirmed_zero) ... ok
+test_eight_hour_shift_with_cip_and_failure_matches_company_example (test_oee_metrics.OeeMetricsCase.test_eight_hour_shift_with_cip_and_failure_matches_company_example) ... ok
+test_full_cip_shift_is_operating_time_and_not_a_failure (test_oee_metrics.OeeMetricsCase.test_full_cip_shift_is_operating_time_and_not_a_failure) ... ok
+test_full_stopped_shift_cannot_have_positive_output (test_oee_metrics.OeeMetricsCase.test_full_stopped_shift_cannot_have_positive_output) ... ok
+test_hand_calculated_company_timebase_includes_cip_and_nontechnical (test_oee_metrics.OeeMetricsCase.test_hand_calculated_company_timebase_includes_cip_and_nontechnical) ... ok
+test_invalid_counts_nonfinite_rate_and_equal_shift_rejected (test_oee_metrics.OeeMetricsCase.test_invalid_counts_nonfinite_rate_and_equal_shift_rejected) ... ok
+test_legacy_cached_times_are_recomputed_for_mixed_period_reports (test_oee_metrics.OeeMetricsCase.test_legacy_cached_times_are_recomputed_for_mixed_period_reports) ... ok
+test_legacy_sheet_read_uses_recorded_rates_and_preserves_encoded_evidence (test_oee_metrics.OeeMetricsCase.test_legacy_sheet_read_uses_recorded_rates_and_preserves_encoded_evidence) ... ok
+test_multi_product_weighted_quality_matches_oee_identity (test_oee_metrics.OeeMetricsCase.test_multi_product_weighted_quality_matches_oee_identity) ... ok
+test_no_failure_does_not_mean_mtbf_zero (test_oee_metrics.OeeMetricsCase.test_no_failure_does_not_mean_mtbf_zero) ... ok
+test_nontechnical_duration_does_not_reduce_company_availability (test_oee_metrics.OeeMetricsCase.test_nontechnical_duration_does_not_reduce_company_availability) ... ok
+test_outside_shift_zero_duration_or_foreign_component_rejected (test_oee_metrics.OeeMetricsCase.test_outside_shift_zero_duration_or_foreign_component_rejected) ... ok
+test_over_100_performance_is_flagged_not_clamped (test_oee_metrics.OeeMetricsCase.test_over_100_performance_is_flagged_not_clamped) ... ok
+test_overlap_even_across_categories_is_rejected (test_oee_metrics.OeeMetricsCase.test_overlap_even_across_categories_is_rejected) ... ok
+test_overnight_stops_and_adjacent_intervals (test_oee_metrics.OeeMetricsCase.test_overnight_stops_and_adjacent_intervals) ... ok
+test_unknown_quality_or_rate_is_not_zero_or_perfect (test_oee_metrics.OeeMetricsCase.test_unknown_quality_or_rate_is_not_zero_or_perfect) ... ok
+test_report_recalculates_old_facts_and_details_without_writing (test_oee_cip_report.CipReportCase.test_report_recalculates_old_facts_and_details_without_writing) ... ok
+test_revision_history_returns_original_stored_evidence (test_oee_cip_report.CipReportCase.test_revision_history_returns_original_stored_evidence) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.004s
+
+OK

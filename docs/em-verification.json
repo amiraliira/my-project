@@ -1,0 +1,121 @@
+{
+  "successful": true,
+  "date": "2026-11-07",
+  "applicationVersion": "2.0.0-rc.12",
+  "packageRevision": 2,
+  "apiVersion": 7,
+  "coreSchemaVersion": 10,
+  "companyServerContacted": false,
+  "deployed": false,
+  "scope": "local EM recorded-downtime feature and selected regression checks",
+  "metric": {
+    "id": "reported-em-downtime-v1",
+    "orders": "completed EM only",
+    "stopFlag": "JSON boolean true",
+    "duration": "recorded integer minutes 0..1440",
+    "overlapDeduplicated": false,
+    "lineIdentity": "exact current asset hall and line",
+    "missingDurationIsNotZero": true,
+    "maximumInclusiveDays": 366
+  },
+  "offlineBackend": {
+    "successful": true,
+    "testsPassed": 17,
+    "skipped": 0
+  },
+  "nativeBackend": {
+    "successful": true,
+    "testsPassed": 17,
+    "skipped": 0,
+    "postgresql": "18.6",
+    "verifiedTls": true,
+    "ownedPostmasterStopped": true
+  },
+  "frontend": {
+    "successful": true,
+    "testsPassed": 123,
+    "skipped": 0,
+    "typecheck": true,
+    "productionBuild": true
+  },
+  "browser": {
+    "successful": true,
+    "companyServerContacted": false,
+    "usesSyntheticApi": true,
+    "checks": [
+      "actual-chart-315-recorded-minutes",
+      "same-line-name-different-halls-separated",
+      "line-opens-exact-hall-date-activities",
+      "workers-parts-and-separate-time-measures-visible",
+      "activity-opens-authorized-original-report",
+      "complete-27-activity-pagination",
+      "all-lines-paginated",
+      "shrinking-pages-recover-without-loop",
+      "unclassified-line-drilldown",
+      "unknown-duration-warning-is-distinct-from-zero",
+      "responsive-chart-1366-900-600-390",
+      "chart-also-visible-in-work-report-list",
+      "chart-also-visible-in-reports-page",
+      "supervisor-report-submits-recorded-downtime",
+      "technician-report-recorded-stop-entry-visible",
+      "technician-report-submits-recorded-downtime",
+      "technician-own-history-chart-is-scoped"
+    ]
+  },
+  "regressionBrowser": {
+    "successful": true,
+    "companyServerContacted": false,
+    "usesSyntheticApi": true,
+    "checks": [
+      "supervisor-visible-registration",
+      "supervisor-default-self",
+      "own-report-without-assignment-fields",
+      "24h-dial-and-Persian-typing",
+      "nested-clock-Escape",
+      "invalid-clock-blocks-stale-payload",
+      "own-report-canonical-payload",
+      "new-mixed-report-opens-own-coworker-review",
+      "stable-delayed-background-refresh",
+      "own-coworker-0-to-3-no-self-or-foreign-grade",
+      "overdue-drilldown-filter",
+      "responsive-management-no-page-overflow",
+      "head-only-supervisor-grade-0-to-9",
+      "technician-head-grade-0-to-3",
+      "technician-form-shared-theme",
+      "responsive-technician-no-page-overflow"
+    ]
+  },
+  "oeeNavigationRegression": {
+    "successful": true,
+    "syntheticApi": true,
+    "companyServerContacted": false,
+    "checks": [
+      "explicit-navigation-dismissal-keeps-form",
+      "dismissed-back-restores-form-and-URL",
+      "dismissed-forward-restores-form-and-URL",
+      "accepted-forward-keeps-history-branch",
+      "accepted-back-leaves-once"
+    ],
+    "totalConfirmations": 6
+  },
+  "initialAttempts": [
+    "Local network permission initially prevented native QA; no native tests were accepted from that attempt.",
+    "The first native feature fixture omitted a synthetic password attribute; fixture corrected and all17 cases passed on rerun.",
+    "Browser automation initially raced a lazy dialog and matched two close controls; waits/selectors corrected, then all17 feature checks passed."
+  ],
+  "limits": [
+    "No live server data, installation or company Nginx acceptance was checked.",
+    "Recorded downtime sum cannot remove overlapping events without separate stop intervals.",
+    "Changing current asset hall/line changes grouping of historical EM reports.",
+    "Baseline r1 evidence is preserved as history; these selected checks are the r2 rerun."
+  ],
+  "proofLogSha256": {
+    "em-backend-final.log": "1ef5ccb0cf5791948c9451fa4a0d3829b3bd09cb32be537893da91431a282bf9",
+    "em-native-final-tests.log": "5a825b40f50f453a5923f0c8e7f2580f0a03612ca53c16da8584f9863590db7c",
+    "em-frontend-final.log": "185c6a080cf927149c0d7e6cf552dc1f2e7628ecf4d0faeb1a063df311251b3e",
+    "em-build-final.log": "078a33a561d42368f767b95d7509c5e4345be47d2f08c77656e92b9d57ff08b5",
+    "em-browser-final.log": "c0d7af3cd486dfca2b146ffe4fff482a86c0644130325cc08eda0dd8e10a3c1e",
+    "em-enterprise-regression.log": "a0849558eb0b7b12209b7d21a650840e907093aba4b9f0b60738ae1c85c0dc5a",
+    "em-oee-regression.log": "ff4d9154ae20bbd5a10d2a6a29838a61f7ccbafecb22a039ab8d88840a13ecb6"
+  }
+}

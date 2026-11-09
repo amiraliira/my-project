@@ -1,0 +1,7 @@
+{
+  "version": "2.0.0-rc.10",
+  "syntheticOnly": true,
+  "serialPlansConfiguredFromStartOnQaRolesOnly": true,
+  "reason": "Known restricted-host native PostgreSQL parallel IPC/MessageQueueInternal limitation observed in rc9; no new default-parallel capacity claim is made.",
+  "companyServerOrConfigurationModified": false
+}

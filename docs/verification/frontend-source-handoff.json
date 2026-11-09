@@ -1,0 +1,97 @@
+{
+  "createdUtc": "2026-10-21T12:40:16.789264+00:00",
+  "version": "2.0.0-rc.10",
+  "scope": "Frontend source handoff, compression build lifecycle, and reproduction of delivered production assets",
+  "environment": {
+    "os": "Windows x64",
+    "node": "24.19.0",
+    "vite": "7.3.6",
+    "dependencySource": "existing reviewed local cache; no dependency downloads"
+  },
+  "source": {
+    "businessSourceFiles": 51,
+    "businessSourceMatchesRc10": true,
+    "testFiles": 14,
+    "publicFiles": 5
+  },
+  "tests": {
+    "command": "node --test --test-isolation=none tests/*.test.mjs",
+    "run": 56,
+    "passed": 56,
+    "failed": 0,
+    "skipped": 0,
+    "addedIntegrationTests": [
+      "gzip JS/CSS decode roundtrip in custom nested output directory",
+      "original unresolved-import build failure retained without compression ENOENT masking"
+    ]
+  },
+  "typecheck": {
+    "command": "node node_modules/typescript/bin/tsc --project tsconfig.json --noEmit --incremental false",
+    "exitCode": 0
+  },
+  "build": {
+    "command": "PAK_BUILD_IN_PROCESS=1 node node_modules/vite/bin/vite.js build --configLoader native",
+    "exitCode": 0,
+    "modulesTransformed": 77,
+    "outputFiles": 44,
+    "allOutputHashesMatchCanonicalRc10": true,
+    "allOutputHashesMatchDeliveredItZip": true,
+    "productionFilesSha256": {
+      "icon.svg": "324f14291a9201d40a61e61cf75f033f46cb1b8ef8aba8344b91e9a2de7410f6",
+      "index.html": "8708fba01ebc8c8081a1945dcd5e8c6081649bebd8350fe04dab63ef16ba9fdd",
+      "manifest.webmanifest": "8a421e835704d5fa9e0e0c8aea493ed1689d34d02e0040dee337fe0d4d33036a",
+      "pak-logo.png": "d6973108ee159bf8cb991e869bed10ddf8becd33f48e2c4001cf8e607f65b52b",
+      "sw.js": "4801eb1349d94a24864f6a4bff5a9af5fbb8d8df1399de8b77cc62d93a4c150a",
+      "THIRD-PARTY-NOTICES.txt": "017f4769bd9ded70eed8521aafd781fc510d490c7bffd50eaedca58837a424f9",
+      "assets/Catalog-BUdJraEQ.js": "e2ed52e710fedb33b90a1f9ab43c12e1af345fa8be788f48a14c53cfc35ce38b",
+      "assets/Catalog-BUdJraEQ.js.gz": "02694dfd4d361f414b1e2429bb4197bd8f16cc8311922e26deff4bbe38eb1643",
+      "assets/index-Cktu9Dij.js": "eb13519bad8de2a6719cb5f083b6fd83eb576e6743b80562c17a6bfc9896c980",
+      "assets/index-Cktu9Dij.js.gz": "4542821d7dd026919723333e666a41e192e50b90ef9823b72dd6054fd41f3802",
+      "assets/index-D4xGPGEp.css": "7da3e23c2d4cedb071c4f7bcac38424e359b727fc9b125493f1ed369043c5fd7",
+      "assets/index-D4xGPGEp.css.gz": "3df2e96f938a26fa03c2db552c62ad8caa727d7c862c95ec1853562cd8f83e04",
+      "assets/Insights-CJQnCjWL.js": "c8ac8f5cb3a7f5671e3d73b1f5f88483858efe4aab07081d2f23b191e195b4fc",
+      "assets/Insights-CJQnCjWL.js.gz": "6aff20cd3faac44d8099699c714c70d34534349e3bf83146a95e862eb73fcd5b",
+      "assets/JalaliDate-9D6PdAeI.js": "f460409d8922746e9248659ac238dde7e484240b7fa791444aa321f39e8562cf",
+      "assets/JalaliDate-9D6PdAeI.js.gz": "33a3544fe2a1b8e6a4b36de509a0706ae85953e1e91d22efd5ca92559202393d",
+      "assets/ManagementHome-TyLnkVvU.js": "475dc16e6ec7d113995c7fbdd3ad0530456f4c150f2c9ac0db3e027c6df640b7",
+      "assets/ManagementHome-TyLnkVvU.js.gz": "92d5253203c8757b0cb4f07bc49a6a118f4bacc78d98c15c3b43004f32521fee",
+      "assets/MasterData-DN8pr03o.js": "14e17fb65a5659931a492b1d14965f2bd8bafbac0ad757f95ea9a8c5a7a5e725",
+      "assets/MasterData-DN8pr03o.js.gz": "3401344158c3ad2b2954b54dad7449c8450e96f243435da3943feea6a455f5c3",
+      "assets/OeeWorkspace-DakY7Uhp.js": "cdacc7f507d4a21a84ed0710bdea405121fb902d346caaec139e4eb57f04aada",
+      "assets/OeeWorkspace-DakY7Uhp.js.gz": "6d5b81feb7eeefc8ac6868c800d553b74c5e08fe1af0fa8169223384ac4e170a",
+      "assets/Orders-BOSrLc65.js": "8b27d672b421dfbe53cc5e0dd9fde5611674aa3d4c78ef5f4b3cdcc7e27d4bb1",
+      "assets/Orders-BOSrLc65.js.gz": "53ce09975f108a0765efdbcc1b22e1dad0699ba2affec3315bcfb3ac8fce5dae",
+      "assets/Orders-CIt2_-Jl.css": "a0ef623b195973224be7c384f48ce4c7057650677661c83772af4f195573bc50",
+      "assets/Orders-CIt2_-Jl.css.gz": "06d1714a845783fce97bd19c1422f672a8bf48562ee5cb060f2ac8d26744dc2c",
+      "assets/permissions-B4UEnqrb.js": "997d7c4960d5282b2ac926e17526807a162c1bd8bd633779a2ecdd341689a43e",
+      "assets/permissions-B4UEnqrb.js.gz": "a6230bbb5e81a8407b27409030d44ae8910e58158700eab48831ffcda93a6dc7",
+      "assets/PmArchive-BHW51ft4.css": "0dfae808252e050f4e93b5b2af6a2cfaaa77522e9582975dfded127123cbdda8",
+      "assets/PmArchive-BHW51ft4.css.gz": "d0efc1867fe6275dda39ed78b14fffa41aeba6603249dcbd11a21a2bc84a4df0",
+      "assets/PmArchive-e7K_MzIR.js": "776b1d768a142b944f6e8b93f1897e257034cad68664e582ae214772bc8dc07e",
+      "assets/PmArchive-e7K_MzIR.js.gz": "8c5dfdaa29cd1537e2f56f216a3181382c0d360a45392741af00597b9b1c73f0",
+      "assets/PmLibrary-Bv0Fmer9.css": "4f99cae475a164ddd60e2a16140144af736571e3d217899b0706d19ca7fe1ec2",
+      "assets/PmLibrary-Bv0Fmer9.css.gz": "5cbb86716bd7647f330c7d21ad32505932c0cb3d1f8217fbff2bfa01a41013eb",
+      "assets/PmLibrary-o7Bclbo2.js": "2fbbaa8ca7e9e3a71fd8a849709ab39823734f34474b647f05e72657d2477049",
+      "assets/PmLibrary-o7Bclbo2.js.gz": "8f2eef3a08bc419d0c44de52585ef4962f547d35d54f9a46adbaa18b06ef78b7",
+      "assets/PmWorkspace-Ce6nROjc.js": "0eceb7e603174d80c76f56879fe62dc0a1a66dcdc42628679f12bf27dc00b9b4",
+      "assets/PmWorkspace-Ce6nROjc.js.gz": "9500e8224c35e495dcf16bf9a26a1a78fb33b8e4d79480e86f4208f1f132d2c5",
+      "assets/PmWorkspace-CvHuRejy.css": "b0e6f0082bcd837a3a4567ff92d1b7eb5d9d1de5303664dcb8598085ac24d118",
+      "assets/PmWorkspace-CvHuRejy.css.gz": "6a0f7be19ee67fd3ed413034c92be6f21f5d6983188672dc350b9c235483933b",
+      "assets/TechnicianRegistration-D6UYJNSb.js": "6d4be2e4abb1b24d2b2384a2d09f1d5e07f165e81b7cceb84cb742a88ddce1d5",
+      "assets/TechnicianRegistration-D6UYJNSb.js.gz": "7596002b9f14cec34a58ea055b00bd3dff5a3903e0a2468d34616be934e57e66",
+      "assets/TechnicianRegistration-z_wZ4R4p.css": "703e3dbc17b07f3184f780fb37c73c3fb318b11fe31fdfb5f1e1c4cb2c25875a",
+      "assets/TechnicianRegistration-z_wZ4R4p.css.gz": "1f9fa7ff8061cc2d6d135e3c5555f3dde1948edf0ab154984765b6c70e4864bd"
+    }
+  },
+  "changedFrontendFiles": [
+    "frontend/vite.config.mjs",
+    "frontend/tests/build-assets.test.mjs"
+  ],
+  "itPackageUnchangedSha256": "1ab2f32ffa1fba86b55de14e425439a277057a91652795b3afc61d7d4c7f8b6f",
+  "limitations": [
+    "Executed on the Windows review host, not the company Linux server.",
+    "Restricted-host in-process production build was used; a clean Linux dependency installation and standard build were not executed.",
+    "The staging node_modules junction is a local QA convenience and must be excluded from delivery."
+  ],
+  "productionAccepted": false
+}

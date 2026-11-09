@@ -1,0 +1,134 @@
+{
+  "version": "2.0.0-rc.10",
+  "recordedUtc": "2026-10-21T11:18:49.926944+00:00",
+  "syntheticOnly": true,
+  "baseline": "Isolated copy of rc9 application source captured before changes",
+  "current": "Final LIMIT-based year probe",
+  "sameBusinessDataset": true,
+  "reports": 100020,
+  "pmSheets": 20001,
+  "parts": 10000,
+  "historicalGregorianYears": 15,
+  "transport": "real loopback verified TLS HTTP",
+  "parallelQueryWorkers": 0,
+  "comparisonOrder": "baseline then current; same owned database; no business writes between runs",
+  "rounds": [
+    {
+      "clients": 1,
+      "requestsPerVariant": 8,
+      "baseline": {
+        "requests": 8,
+        "p50Milliseconds": 480.163,
+        "p95Milliseconds": 1046.728,
+        "maxMilliseconds": 1165.604,
+        "failures": 0,
+        "maxResponseBytes": 47976
+      },
+      "current": {
+        "requests": 8,
+        "p50Milliseconds": 577.716,
+        "p95Milliseconds": 1129.991,
+        "maxMilliseconds": 1137.646,
+        "failures": 0,
+        "maxResponseBytes": 47976
+      },
+      "personnelPerformanceBaseline": {
+        "requests": 1,
+        "p50Milliseconds": 1165.604,
+        "p95Milliseconds": 1165.604,
+        "maxMilliseconds": 1165.604,
+        "failures": 0,
+        "maxResponseBytes": 10929
+      },
+      "personnelPerformanceCurrent": {
+        "requests": 1,
+        "p50Milliseconds": 1129.991,
+        "p95Milliseconds": 1129.991,
+        "maxMilliseconds": 1129.991,
+        "failures": 0,
+        "maxResponseBytes": 10929
+      }
+    },
+    {
+      "clients": 10,
+      "requestsPerVariant": 80,
+      "baseline": {
+        "requests": 80,
+        "p50Milliseconds": 1505.716,
+        "p95Milliseconds": 3959.614,
+        "maxMilliseconds": 4085.907,
+        "failures": 0,
+        "maxResponseBytes": 47976
+      },
+      "current": {
+        "requests": 80,
+        "p50Milliseconds": 1504.526,
+        "p95Milliseconds": 3988.993,
+        "maxMilliseconds": 4432.297,
+        "failures": 0,
+        "maxResponseBytes": 47976
+      },
+      "personnelPerformanceBaseline": {
+        "requests": 10,
+        "p50Milliseconds": 3856.644,
+        "p95Milliseconds": 3959.614,
+        "maxMilliseconds": 4055.221,
+        "failures": 0,
+        "maxResponseBytes": 10929
+      },
+      "personnelPerformanceCurrent": {
+        "requests": 10,
+        "p50Milliseconds": 3870.912,
+        "p95Milliseconds": 4093.517,
+        "maxMilliseconds": 4432.297,
+        "failures": 0,
+        "maxResponseBytes": 10929
+      }
+    },
+    {
+      "clients": 25,
+      "requestsPerVariant": 200,
+      "baseline": {
+        "requests": 200,
+        "p50Milliseconds": 3775.905,
+        "p95Milliseconds": 9998.769,
+        "maxMilliseconds": 11855.835,
+        "failures": 0,
+        "maxResponseBytes": 47976
+      },
+      "current": {
+        "requests": 200,
+        "p50Milliseconds": 3830.008,
+        "p95Milliseconds": 9757.145,
+        "maxMilliseconds": 10779.389,
+        "failures": 0,
+        "maxResponseBytes": 47976
+      },
+      "personnelPerformanceBaseline": {
+        "requests": 25,
+        "p50Milliseconds": 8556.284,
+        "p95Milliseconds": 9449.772,
+        "maxMilliseconds": 9998.769,
+        "failures": 0,
+        "maxResponseBytes": 10929
+      },
+      "personnelPerformanceCurrent": {
+        "requests": 25,
+        "p50Milliseconds": 8340.295,
+        "p95Milliseconds": 9615.745,
+        "maxMilliseconds": 9780.443,
+        "failures": 0,
+        "maxResponseBytes": 10929
+      }
+    }
+  ],
+  "baselineFailedRequests": 0,
+  "currentFailedRequests": 0,
+  "totalRequestsAcrossBothVariants": 576,
+  "discardedRuns": [
+    "Initial EXISTS candidate had a measured SQL-plan regression and was replaced before delivery.",
+    "A subsequent harness-only Decimal scope NameError invalidated its score checks despite HTTP 200; that run was discarded, the harness fixed, then both variants rerun with count/score checks passing."
+  ],
+  "broadSystemSpeedupEstablished": false,
+  "limits": "One local paired run per variant; synthetic mix and restricted-host serial SQL. Timing variance remains. Target company hardware/network acceptance is required."
+}

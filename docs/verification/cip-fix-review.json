@@ -1,0 +1,31 @@
+{
+  "patchId": "cip.1",
+  "applicationBase": "2.0.0-rc.10-handoff.1",
+  "formulaVersion": "pak-oee-count-3",
+  "tests": {
+    "modules": [
+      "test_oee_metrics",
+      "test_oee_cip_report"
+    ],
+    "run": 21,
+    "passed": 21,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "example": {
+    "shiftMinutes": "480",
+    "plannedMinutes": "60",
+    "technicalMinutes": "60",
+    "runMinutes": "420",
+    "technicalAvailability": "87.5"
+  },
+  "nativePostgreSqlTestsRun": false,
+  "nativePostgreSqlNote": "Regression added to test_oee_service; actual isolated PostgreSQL dependencies/configuration are unavailable here",
+  "frontendChanged": false,
+  "frontendBuildRun": false,
+  "deploymentPerformed": false,
+  "databaseMigrationRequired": false,
+  "storedEvidenceRewritten": false,
+  "bundledSourceVerifier": "Blocked by current Windows Path.resolve(strict=True) WinError5; independent ZIP CRC and complete manifest hashes/sizes verified"
+}

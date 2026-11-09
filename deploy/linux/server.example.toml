@@ -1,0 +1,31 @@
+# Template only. Replace every example path/IP with the actual approved value.
+# Normal startup does not migrate, restore or seed the database.
+listen_url = "https://192.168.1.10:5187"
+frontend_directory = "/opt/pak/PAK-Source-rc10/frontend/dist"
+seed_directory = "/opt/pak/shared/seed"
+backup_directory = "/opt/pak/shared/backups"
+development = false
+# Enable only after the approved PM start decision and migration acceptance.
+scheduling_enabled = false
+company_name = "شرکت لبنیات پاک"
+
+automatic_backup_enabled = true
+backup_interval_hours = 24
+backup_retention_count = 14
+# Existing native tools ON THE BACKEND HOST, matching database major 18.
+# A path inside FanipakDB is not a host executable path.
+postgresql_dump_executable = "/usr/lib/postgresql/18/bin/pg_dump"
+postgresql_restore_executable = "/usr/lib/postgresql/18/bin/pg_restore"
+
+[database]
+provider = "postgresql"
+# Example: Docker-published port on the same Linux backend host.
+# The DB TLS certificate must cover this numeric address.
+host = "127.0.0.1"
+port = 5432
+database = "pak_maintenance"
+user = "pak_runtime"
+password = ""
+sslmode = "verify-full"
+sslrootcert = "/opt/pak/shared/certificates/database-ca.crt"
+development = false

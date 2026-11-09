@@ -1,0 +1,45 @@
+{
+  "successful": true,
+  "unitTestsPassed": 110,
+  "unitTestsSkipped": 0,
+  "typecheck": true,
+  "productionBuild": true,
+  "formsBrowser": {
+    "successful": true,
+    "companyServerContacted": false,
+    "usesSyntheticApi": true,
+    "checks": [
+      "supervisor-visible-registration",
+      "supervisor-default-self",
+      "own-report-without-assignment-fields",
+      "24h-dial-and-Persian-typing",
+      "nested-clock-Escape",
+      "invalid-clock-blocks-stale-payload",
+      "own-report-canonical-payload",
+      "new-mixed-report-opens-own-coworker-review",
+      "stable-delayed-background-refresh",
+      "own-coworker-0-to-3-no-self-or-foreign-grade",
+      "overdue-drilldown-filter",
+      "responsive-management-no-page-overflow",
+      "head-only-supervisor-grade-0-to-9",
+      "technician-head-grade-0-to-3",
+      "technician-form-shared-theme",
+      "responsive-technician-no-page-overflow"
+    ]
+  },
+  "oeeNavigationBrowser": {
+    "successful": true,
+    "syntheticApi": true,
+    "companyServerContacted": false,
+    "checks": [
+      "explicit-navigation-dismissal-keeps-form",
+      "dismissed-back-restores-form-and-URL",
+      "dismissed-forward-restores-form-and-URL",
+      "accepted-forward-keeps-history-branch",
+      "accepted-back-leaves-once"
+    ],
+    "totalConfirmations": 6
+  },
+  "usesSyntheticApi": true,
+  "companyServerContacted": false
+}

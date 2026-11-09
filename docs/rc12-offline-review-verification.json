@@ -1,0 +1,318 @@
+{
+  "successful": true,
+  "testsRun": 411,
+  "failures": 0,
+  "errors": 0,
+  "skipped": [
+    {
+      "test": "test_autodetect_headers_after_title_exact_codes_blank_price_zero_and_rial (test_parts_import.PartsImportPostgresqlTests.test_autodetect_headers_after_title_exact_codes_blank_price_zero_and_rial)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_concurrent_same_preview_commits_once (test_parts_import.PartsImportPostgresqlTests.test_concurrent_same_preview_commits_once)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_explicit_zero_format_preserves_code_and_late_ambiguity_invalidates_preview (test_parts_import.PartsImportPostgresqlTests.test_explicit_zero_format_preserves_code_and_late_ambiguity_invalidates_preview)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_no_price_column_preserves_price_and_missing_unit (test_parts_import.PartsImportPostgresqlTests.test_no_price_column_preserves_price_and_missing_unit)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_numeric_code_cannot_guess_lost_leading_zeros_but_text_is_exact (test_parts_import.PartsImportPostgresqlTests.test_numeric_code_cannot_guess_lost_leading_zeros_but_text_is_exact)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_stale_preview_modified_file_and_replay_do_not_write (test_parts_import.PartsImportPostgresqlTests.test_stale_preview_modified_file_and_replay_do_not_write)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_summary_audit_failure_rolls_back_all_native_mutations (test_parts_import.PartsImportPostgresqlTests.test_summary_audit_failure_rolls_back_all_native_mutations)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_used_unit_cannot_change_and_stock_is_not_imported (test_parts_import.PartsImportPostgresqlTests.test_used_unit_cannot_change_and_stock_is_not_imported)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "setUpClass (test_performance_years.PerformanceYearTests)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_concurrent_submission_commits_one_immutable_snapshot (test_pm_archive.PmArchiveTests.test_concurrent_submission_commits_one_immutable_snapshot)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_explicit_v7_upgrade_is_additive_idempotent_and_backfills_honestly (test_pm_archive.PmArchiveTests.test_explicit_v7_upgrade_is_additive_idempotent_and_backfills_honestly)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_historical_return_resubmit_keeps_answers_names_form_and_revision_approvals (test_pm_archive.PmArchiveTests.test_historical_return_resubmit_keeps_answers_names_form_and_revision_approvals)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_large_archive_pages_are_bounded_and_lighter_than_work_order_lists (test_pm_archive.PmArchiveTests.test_large_archive_pages_are_bounded_and_lighter_than_work_order_lists)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_native_backup_restore_preserves_filled_archive_and_immutable_guards (test_pm_archive.PmArchiveTests.test_native_backup_restore_preserves_filled_archive_and_immutable_guards)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_only_planner_reads_archive_and_search_filters_are_effective (test_pm_archive.PmArchiveTests.test_only_planner_reads_archive_and_search_filters_are_effective)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_concurrency_one_commit_and_audit_failure_rolls_back_on_postgresql (test_pm_responsibility.PmResponsibilityPostgresqlTests.test_concurrency_one_commit_and_audit_failure_rolls_back_on_postgresql)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_full_api_transfer_execution_approval_and_frozen_archive (test_pm_responsibility.PmResponsibilityPostgresqlTests.test_full_api_transfer_execution_approval_and_frozen_archive)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_native_routing_guards_reject_forged_transfer_and_history_rewrites (test_pm_responsibility.PmResponsibilityPostgresqlTests.test_native_routing_guards_reject_forged_transfer_and_history_rewrites)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_full_original_bundle_269_readonly_hashes_and_no_auto_activation (test_pm_service.PmTests.test_full_original_bundle_269_readonly_hashes_and_no_auto_activation)",
+      "reason": "Original company input bundle is not part of this portable test checkout"
+    },
+    {
+      "test": "test_pm_clock_singleworker_rule_and_archive_failure_roll_back_everything (test_review_correction.PmReviewCorrectionPostgresqlTests.test_pm_clock_singleworker_rule_and_archive_failure_roll_back_everything)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_pm_snapshot_preserves_original_and_exposes_real_supervisor_actor_then_finalizes (test_review_correction.PmReviewCorrectionPostgresqlTests.test_pm_snapshot_preserves_original_and_exposes_real_supervisor_actor_then_finalizes)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_api_route_only_admits_supervisors_and_uses_real_domain_validation (test_review_correction.ReviewCorrectionPostgresqlTests.test_api_route_only_admits_supervisors_and_uses_real_domain_validation)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_atomic_correction_approves_own_and_carries_other_unit_without_re_review (test_review_correction.ReviewCorrectionPostgresqlTests.test_atomic_correction_approves_own_and_carries_other_unit_without_re_review)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_audit_failure_rolls_back_every_line_policy_and_revision (test_review_correction.ReviewCorrectionPostgresqlTests.test_audit_failure_rolls_back_every_line_policy_and_revision)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_concurrent_corrections_have_one_winner_and_no_duplicate_revision (test_review_correction.ReviewCorrectionPostgresqlTests.test_concurrent_corrections_have_one_winner_and_no_duplicate_revision)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_first_review_for_other_specialty_stays_pending_without_return_loop (test_review_correction.ReviewCorrectionPostgresqlTests.test_first_review_for_other_specialty_stays_pending_without_return_loop)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_foreign_people_unknown_fields_invalid_quantities_and_noops_are_atomic (test_review_correction.ReviewCorrectionPostgresqlTests.test_foreign_people_unknown_fields_invalid_quantities_and_noops_are_atomic)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_invalid_own_grades_roll_back_correction_carried_approvals_and_every_line (test_review_correction.ReviewCorrectionPostgresqlTests.test_invalid_own_grades_roll_back_correction_carried_approvals_and_every_line)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_joint_report_assigned_to_other_specialty_keeps_assignment_during_own_correction (test_review_correction.ReviewCorrectionPostgresqlTests.test_joint_report_assigned_to_other_specialty_keeps_assignment_during_own_correction)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_parts_can_be_added_increased_removed_and_cleared_without_stock_movement (test_review_correction.ReviewCorrectionPostgresqlTests.test_parts_can_be_added_increased_removed_and_cleared_without_stock_movement)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_role_or_specialty_drift_cannot_reinterpret_frozen_policies (test_review_correction.ReviewCorrectionPostgresqlTests.test_role_or_specialty_drift_cannot_reinterpret_frozen_policies)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_role_session_stage_and_already_approved_specialty_are_enforced (test_review_correction.ReviewCorrectionPostgresqlTests.test_role_session_stage_and_already_approved_specialty_are_enforced)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_successive_specialty_corrections_preserve_original_carried_actor_after_rename (test_review_correction.ReviewCorrectionPostgresqlTests.test_successive_specialty_corrections_preserve_original_carried_actor_after_rename)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_unchanged_form_approves_without_new_revision_or_correction_snapshot (test_review_correction.ReviewCorrectionPostgresqlTests.test_unchanged_form_approves_without_new_revision_or_correction_snapshot)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_dashboard_grouped_overview_preserves_all_role_scopes_and_cancelled_semantics (test_review_regressions.ReviewRegressions.test_dashboard_grouped_overview_preserves_all_role_scopes_and_cancelled_semantics)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_dashboard_legacy_mix_retains_per_order_half_even_rounding (test_review_regressions.ReviewRegressions.test_dashboard_legacy_mix_retains_per_order_half_even_rounding)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_future_execution_stays_draft_until_it_really_ends_in_tehran (test_review_regressions.ReviewRegressions.test_future_execution_stays_draft_until_it_really_ends_in_tehran)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_overnight_execution_uses_the_following_tehran_date (test_review_regressions.ReviewRegressions.test_overnight_execution_uses_the_following_tehran_date)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_paged_inbox_search_is_forwarded_and_stays_in_supervisor_scope (test_review_regressions.ReviewRegressions.test_paged_inbox_search_is_forwarded_and_stays_in_supervisor_scope)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_prepared_csv_closes_postgresql_snapshot_before_slow_consumer (test_review_regressions.ReviewRegressions.test_prepared_csv_closes_postgresql_snapshot_before_slow_consumer)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_work_csv_respects_search_and_status_without_returning_other_reports (test_review_regressions.ReviewRegressions.test_work_csv_respects_search_and_status_without_returning_other_reports)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_direct_head_real_guards_and_report_totals (test_supervisor_work.SupervisorWorkPostgresqlTests.test_direct_head_real_guards_and_report_totals)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_mixed_native_policy_limits_and_atomic_failure (test_supervisor_work.SupervisorWorkPostgresqlTests.test_mixed_native_policy_limits_and_atomic_failure)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_native_policy_immutability_and_grade_rejection (test_supervisor_work.SupervisorWorkPostgresqlTests.test_native_policy_immutability_and_grade_rejection)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_promoted_participant_cannot_grade_own_work_as_head (test_supervisor_work.SupervisorWorkPostgresqlTests.test_promoted_participant_cannot_grade_own_work_as_head)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_concurrent_snapshot_refused_and_postgres_is_never_file_copied (test_api.BackupTests.test_concurrent_snapshot_refused_and_postgres_is_never_file_copied)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_consistent_snapshot_integrity_hash_and_source_unchanged (test_api.BackupTests.test_consistent_snapshot_integrity_hash_and_source_unchanged)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_config_refuses_public_listener_different_modes_and_production_sqlite (test_api.ConfigurationStaticTests.test_config_refuses_public_listener_different_modes_and_production_sqlite)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_disabled_scheduler_does_not_issue_anything (test_api.ConfigurationStaticTests.test_disabled_scheduler_does_not_issue_anything)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_factory_no_dependency_install_or_database_fallback (test_api.ConfigurationStaticTests.test_factory_no_dependency_install_or_database_fallback)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_static_paths_only_read_local_ui_and_deny_source_or_traversal (test_api.ConfigurationStaticTests.test_static_paths_only_read_local_ui_and_deny_source_or_traversal)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_login_digest_epoch_and_change_password_invalidate_all_sessions (test_api.SessionTests.test_login_digest_epoch_and_change_password_invalidate_all_sessions)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_revoked_admin_cannot_reset_after_pretransaction_authentication (test_api.SessionTests.test_revoked_admin_cannot_reset_after_pretransaction_authentication)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_asset_history_keeps_legacy_array_and_paged_contracts (test_http_review.AuthorizationReviewTests.test_asset_history_keeps_legacy_array_and_paged_contracts)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_duplicate_authentication_cookie_fails_closed (test_http_review.AuthorizationReviewTests.test_duplicate_authentication_cookie_fails_closed)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_health_does_not_advertise_client_acceptance_before_integration (test_http_review.AuthorizationReviewTests.test_health_does_not_advertise_client_acceptance_before_integration)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_in_transaction_authority_rejects_epoch_specialty_role_and_active_changes (test_http_review.AuthorizationReviewTests.test_in_transaction_authority_rejects_epoch_specialty_role_and_active_changes)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_login_rechecks_authority_after_password_work_before_creating_session (test_http_review.AuthorizationReviewTests.test_login_rechecks_authority_after_password_work_before_creating_session)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_postgres_actor_lock_is_requested_before_returning_authority (test_http_review.AuthorizationReviewTests.test_postgres_actor_lock_is_requested_before_returning_authority)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_default_port_authorities_include_browser_omission (test_http_review.ConfigurationLauncherReviewTests.test_default_port_authorities_include_browser_omission)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_https_requires_local_explicit_certificate_and_key (test_http_review.ConfigurationLauncherReviewTests.test_https_requires_local_explicit_certificate_and_key)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_launcher_disables_proxy_headers_reload_external_bind_and_access_log (test_http_review.ConfigurationLauncherReviewTests.test_launcher_disables_proxy_headers_reload_external_bind_and_access_log)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_available_mapped_drives_are_refused_without_contacting_targets (test_network_policy.FilePathTests.test_available_mapped_drives_are_refused_without_contacting_targets)",
+      "reason": "No existing mapped drives on this host; no test mapping is created."
+    },
+    {
+      "test": "test_existing_symlink_and_descendants_are_refused (test_network_policy.FilePathTests.test_existing_symlink_and_descendants_are_refused)",
+      "reason": "Host does not permit test symlinks: OSError"
+    },
+    {
+      "test": "test_every_legacy_api_path_and_method_has_an_actual_binding (test_parity_contract.ParityContractTests.test_every_legacy_api_path_and_method_has_an_actual_binding)",
+      "reason": "Legacy source is unavailable in this portable checkout"
+    },
+    {
+      "test": "test_health_retains_legacy_capabilities_without_claiming_acceptance (test_parity_contract.ParityContractTests.test_health_retains_legacy_capabilities_without_claiming_acceptance)",
+      "reason": "Legacy source is unavailable in this portable checkout"
+    },
+    {
+      "test": "test_old_csharp_hash_replays_same_document_without_duplicate (test_migration_parity.ExistingClaimReplayTests.test_old_csharp_hash_replays_same_document_without_duplicate)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    },
+    {
+      "test": "test_revoked_actor_cannot_mutate_after_old_request_snapshot (test_migration_parity.ExistingClaimReplayTests.test_revoked_actor_cannot_mutate_after_old_request_snapshot)",
+      "reason": "Real PostgreSQL fixture requires explicit isolated PAK_POSTGRES_TEST_CONFIG"
+    }
+  ],
+  "failedTests": [],
+  "targets": [
+    "test_database",
+    "test_db_review",
+    "test_export_preparation",
+    "test_manual_config",
+    "test_manual_asgi",
+    "test_manual_http",
+    "test_master_data",
+    "test_oee_metrics",
+    "test_oee_cip_report",
+    "test_own_performance",
+    "test_parts_import",
+    "test_performance_years",
+    "test_pm_activity_structure",
+    "test_pm_archive",
+    "test_pm_calendar",
+    "test_pm_responsibility",
+    "test_pm_service",
+    "test_reporting_integrity",
+    "test_reverse_proxy",
+    "test_review_correction",
+    "test_review_regressions",
+    "test_security",
+    "test_sql_compile_cache",
+    "test_supervisor_work",
+    "test_update_http",
+    "test_workflow",
+    "test_api",
+    "test_http_review",
+    "test_http_security",
+    "test_network_policy",
+    "test_parity_contract",
+    "test_migration_parity"
+  ],
+  "companyServerContacted": false,
+  "fixtureData": "synthetic",
+  "nativeTestsRunSeparately": true
+}
