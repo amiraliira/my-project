@@ -1,0 +1,8 @@
+.local-test-accounts { margin:0 0 20px; padding:14px; border:1px solid #426b68; border-radius:10px; background:#19312f; min-width:0; }
+.local-test-accounts>b { color:#bce9df; font-size:13px; }
+.local-test-accounts>p { color:#c1d2d0; font-size:11px; line-height:2; margin:8px 0 12px; }
+.local-test-accounts>.field { margin:0; min-width:0; }
+.local-test-accounts select { width:100%; min-width:0; max-width:100%; min-height:44px; background:#242e3b; border-color:#455970; color:#edf3f7; }
+.local-test-accounts .alert { margin:0 0 12px; }
+.local-test-password-note { display:block; margin:0 0 12px; color:#a9bece; font-size:11px; line-height:2; }
+@media(max-width:450px) { .local-test-accounts { padding:12px; } .local-test-accounts select { font-size:16px; } }
