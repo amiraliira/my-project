@@ -1,0 +1,104 @@
+{
+  "successful": true,
+  "date": "2026-11-12",
+  "packageRevision": 3,
+  "applicationVersion": "2.0.0-rc.12",
+  "apiVersion": 7,
+  "coreSchemaVersion": 10,
+  "optionalOeeSchemaVersion": 1,
+  "companyServerContacted": false,
+  "newDatabaseMigrationSinceRevision2": false,
+  "checks": {
+    "backend-bootstrap-and-manual-settings": {
+      "successful": true,
+      "tests": 23,
+      "skipped": 0,
+      "coverage": [
+        "delivered source without database import",
+        "missing/empty initialization rejection",
+        "foreign preloaded package rejection",
+        "existing settings and ASGI factory regression"
+      ]
+    },
+    "canonical-documentation": {
+      "successful": true,
+      "canonicalReadmesAndPointersChecked": 12,
+      "localLinksChecked": 81,
+      "linkErrors": [],
+      "configPreflightPassed": true,
+      "invalidConfigRejectedWithoutSecretOutput": true,
+      "preflightCreatedNoRuntimeDirectories": true,
+      "frontendFilesByteMatchedToTestedR2": 160
+    },
+    "pinned-dependency-preflight": {
+      "successful": true,
+      "localOnly": true,
+      "databaseConnectionAttempted": false
+    },
+    "native-postgresql-procedures": {
+      "successful": true,
+      "postgresql": "18.6",
+      "testCount": 13,
+      "checks": {
+        "inspect_core8_read_only": {
+          "successful": true
+        },
+        "activation_rejects_core8_without_changes": {
+          "successful": true
+        },
+        "manual_8_to_9_preserves_all_old_rows": {
+          "successful": true
+        },
+        "inspect_core9_read_only": {
+          "successful": true
+        },
+        "manual_9_to_10_preserves_all_old_rows": {
+          "successful": true
+        },
+        "inspect_core10_read_only": {
+          "successful": true
+        },
+        "runtime_core10_verification": {
+          "successful": true
+        },
+        "documented_oee_activation_preserves_core_rows": {
+          "successful": true
+        },
+        "documented_oee_grants_exact": {
+          "successful": true
+        },
+        "repeat_activation_rejected_without_changes": {
+          "successful": true
+        },
+        "runtime_core10_with_oee_verification": {
+          "successful": true
+        },
+        "native_dump_restore_all_rows_equal": {
+          "successful": true,
+          "archiveBytes": 144792,
+          "archiveSha256": "4e50ba69c4e7a1298b20fecb3fe886dd950013300d161f441da50dbb94159160"
+        },
+        "inspect_restored_database_read_only": {
+          "successful": true
+        }
+      },
+      "ownedPostmasterStopped": true
+    },
+    "unchanged-frontend-build-and-assets": {
+      "successful": true,
+      "lastBuildDate": "2026-11-09",
+      "sourceAndBuiltFilesByteMatchedToTestedR2": 160,
+      "frontendCodeOrAssetsChangedInRevision3": false,
+      "buildRanOnWindows": true,
+      "caseSensitiveTypeScriptErrors": 0
+    }
+  },
+  "limits": [
+    "Generated local fixtures only; no current company database or credentials included or inspected.",
+    "Native PostgreSQL SQL was exercised on Windows loopback over verified TLS; Docker shell wrappers and Nginx/Linux deployment require operator execution.",
+    "Existing company data, current schema, active private configuration and runtime role must be verified before applying migrations.",
+    "A browser rc10 label identifies the loaded frontend, not the database schema.",
+    "No application business logic, frontend code, or existing core migration SQL changed in this revision.",
+    "Historical verification documents retain their original scope and counts; these are the additional revision-3 checks."
+  ]
+}

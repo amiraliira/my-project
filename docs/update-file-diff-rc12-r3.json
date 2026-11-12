@@ -1,0 +1,139 @@
+{
+  "base": "sealed rc12 revision 2, 2026-11-07",
+  "target": "rc12 revision 3, 2026-11-12",
+  "changes": [
+    {
+      "path": ".gitignore",
+      "status": "modified",
+      "beforeSha256": "d6a4e8f6df7d6030fe052dc4a5af3e7e5ca5eda2959359cbb9910a070937680a",
+      "afterSha256": "d335402a60be831a1f81ea32287bcfbe017dac01d9a14229a03d45d7e441779e"
+    },
+    {
+      "path": "README.md",
+      "status": "modified",
+      "beforeSha256": "ba2ceac4ce32063ee434d348622d779c4e352faa094a358b8198e465f0034b76",
+      "afterSha256": "38fe34ca6bf29e847be54762a8c697301c755b8b59b5685a3bdab1e59b246477"
+    },
+    {
+      "path": "backend/README.md",
+      "status": "modified",
+      "beforeSha256": "9d8ef9aaf7b58bdd713ec3d3ce2bef992af08d862692b0fbd08e2b74c352d605",
+      "afterSha256": "9040976651365626e95df66295b4448a38b5c358f45274beea095630fc93ef38"
+    },
+    {
+      "path": "backend/app/__init__.py",
+      "status": "modified",
+      "beforeSha256": "a1355864b9bcb28fac33250722c8f5666bd35ff52bbec408b43f9f32214a77db",
+      "afterSha256": "2e3f61a986c173fbdc2f20a198e4f2a4efe3c8b6c60afd21fa567808bfb88a51"
+    },
+    {
+      "path": "backend/oee/README.md",
+      "status": "added",
+      "beforeSha256": null,
+      "afterSha256": "c71a5e9a0e40dab9897ed8515ba3058e489c09bfceb971a7f9221099957ab51a"
+    },
+    {
+      "path": "backend/requirements.txt",
+      "status": "modified",
+      "beforeSha256": "35354427951743d0d551f955b945bd7bf445a6330e9aff72f77ece67a8962894",
+      "afterSha256": "83f73a913aac791d37f8f38065ad3d910e18d274585fea6c32d59f4ea554d1c1"
+    },
+    {
+      "path": "backend/schema/README.md",
+      "status": "added",
+      "beforeSha256": null,
+      "afterSha256": "6007cf9d69397f61dbcb095709313fbd26e6810298389fac74f29090785c939a"
+    },
+    {
+      "path": "backend/schema/inspect.sql",
+      "status": "added",
+      "beforeSha256": null,
+      "afterSha256": "8d91e574429977ab2dcc35965d3e5a9af8dfd01896276a2f56e0664a79903d0f"
+    },
+    {
+      "path": "backend/schema/postgresql-oee-v1.sql",
+      "status": "modified",
+      "beforeSha256": "a0560bdea2c42dda926c07b390d9e5ca74fe055f1fbdf4a79c6faaaa24d09d36",
+      "afterSha256": "ad1eb6b7364786dc77be377a7a2b07c2d55fac505144bf101f8e1988964160c4"
+    },
+    {
+      "path": "backend/tests/test_manual_bootstrap.py",
+      "status": "added",
+      "beforeSha256": null,
+      "afterSha256": "07cadf72d121d85673eac23cdbed27c4d89c3ab0c421b2707ea8a51196eae1cb"
+    },
+    {
+      "path": "backend/tools/check_installation.py",
+      "status": "added",
+      "beforeSha256": null,
+      "afterSha256": "7d0e8462ade7a5e1efa0e66556ac0275dbb9b62bb3bf606f7df9c1205205a5a8"
+    },
+    {
+      "path": "backend/tools/enable_oee.py",
+      "status": "modified",
+      "beforeSha256": "a24bc935598b67af9849d055c3e48c79724e01df2f467a43e661d3aee5e89697",
+      "afterSha256": "483f638ad0d8c16a2f618f9879090172a5d46c278138a96aa88ce2b314c5d84b"
+    },
+    {
+      "path": "deploy/README.md",
+      "status": "added",
+      "beforeSha256": null,
+      "afterSha256": "220bf1fbfed81c0ada106f5d89f429cb284003273e473454f9e4bd7f8233cbd4"
+    },
+    {
+      "path": "docs/README.md",
+      "status": "added",
+      "beforeSha256": null,
+      "afterSha256": "8bf9ff1b0d5bc006859bb9e08961d527feb37604d2977946355f820650fbdbe3"
+    },
+    {
+      "path": "docs/linux-deployment.md",
+      "status": "modified",
+      "beforeSha256": "0d99461969eb101160a95f8b6fbf8631c58040cab3959780974eb1bed72fc271",
+      "afterSha256": "8fef3f26b8dccf0c9a75fc007e9c17546d6174b58806ef1f96ce1e176ae5be96"
+    },
+    {
+      "path": "docs/logs.md",
+      "status": "modified",
+      "beforeSha256": "a72dd8fd72ff18a367d54a7665a80b02b801830b8d5917757c602f6b04ef6bc9",
+      "afterSha256": "53415b3ff575b311e5286a38fcb00b8826b34e265b23b71d27b73f9b19d72fa5"
+    },
+    {
+      "path": "docs/manual-uvicorn.md",
+      "status": "modified",
+      "beforeSha256": "c5b6eb8fea72d80b9b906ed5793937819d9ff5cf75d2a65e3a99128d8f2bf481",
+      "afterSha256": "f4d38f4380c6ac9544bdf6c871b290508013b03263922cc538502d1556c0ed47"
+    },
+    {
+      "path": "docs/operations-verification.json",
+      "status": "added",
+      "beforeSha256": null,
+      "afterSha256": "335192621bef271c311fa99c2673f06fca0dcf06437d9e4301386989fe587dba"
+    },
+    {
+      "path": "docs/pm-files.md",
+      "status": "modified",
+      "beforeSha256": "adca75505c8fd881cff4107bd3ae962b3aa3699922994f780ad0ed39abc0056c",
+      "afterSha256": "db4eb5abacbc3adccf592927eb8e4d1a590c721931e9b19a5cf6a12867c4dc94"
+    },
+    {
+      "path": "docs/runtime-data/README.md",
+      "status": "added",
+      "beforeSha256": null,
+      "afterSha256": "68fb593263bfbbf15604391388a39f1223c32503c88045d063f412e48c1188b7"
+    },
+    {
+      "path": "frontend/README.md",
+      "status": "modified",
+      "beforeSha256": "b702b1cc2eab0410a68ac3227a5f1bb6b257991ea94357ad229df5dd0b280159",
+      "afterSha256": "6851bcefbd0d6379f14ee5e504618407b66b12fedad8a624e0d2d4c95240163b"
+    },
+    {
+      "path": "tools/verify_source.py",
+      "status": "modified",
+      "beforeSha256": "244443fe08d17c39bece0613c7e2bf9a6145a7ac8b781ff4d28c73dbc9271620",
+      "afterSha256": "a7cc841f79b9a570a3d394ce68ffbae9da2d3797e54748cd298fcd68f0fd6cf5"
+    }
+  ],
+  "historicalRootPatchMetadataOmitted": "backend-patch.json (old CIP patch record, not current release contract)"
+}
