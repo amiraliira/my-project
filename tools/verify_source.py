@@ -43,12 +43,16 @@ def verify(root=ROOT):
             current = current / component
             if current.is_symlink():
                 raise ValueError("Source manifest entries must not use symbolic links")
-        if not canonical_local_path(path).is_relative_to(root) or not path.is_file():
+        if not path.is_file():
             raise ValueError("Missing source file: " + name)
+        if not canonical_local_path(path).is_relative_to(root):
+            raise ValueError("Source file escapes the package: " + name)
         if path.stat().st_size != expected["bytes"] or hashlib.sha256(path.read_bytes()).hexdigest() != expected["sha256"]:
             raise ValueError("Source checksum mismatch: " + name)
     required = {
         "backend/pyproject.toml", "backend/requirements.txt", "requirements.txt",
+        "backend/app/__init__.py", "backend/app/main.py", "backend/app/settings.py",
+        "backend/src/pak_maintenance/__init__.py", "backend/tools/check_installation.py",
         "backend/src/pak_maintenance/application.py", "backend/src/pak_maintenance/api.py",
         "frontend/src/App.tsx", "frontend/package.json", "frontend/pnpm-lock.yaml",
         "frontend/vite.config.mjs", "frontend/dist/index.html",
@@ -70,6 +74,9 @@ def verify(root=ROOT):
 if __name__ == "__main__":
     try:
         print(json.dumps(verify(), sort_keys=True))
-    except (ValueError, KeyError, OSError, TypeError):
+    except ValueError as error:
+        print("Source verification failed: " + str(error) + ". Use the complete matching source ZIP.", file=sys.stderr)
+        raise SystemExit(1)
+    except (KeyError, OSError, TypeError):
         print("Source verification failed; use the complete original source ZIP.", file=sys.stderr)
         raise SystemExit(1)
