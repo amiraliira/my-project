@@ -1,6 +1,7 @@
 {
   "applicationVersion": "2.0.0-rc.12",
-  "packageRevision": 2,
+  "packageRevision": 3,
+  "updateDate": "2026-11-12",
   "apiVersion": 7,
   "coreSchemaVersion": 10,
   "optionalOeeSchemaVersion": 1,
@@ -9,32 +10,26 @@
     9,
     10
   ],
-  "updateDate": "2026-11-07",
+  "archiveRoot": "PAK-rc12",
   "releaseStage": "locally-tested-candidate",
   "productionAccepted": false,
-  "deployed": false,
   "companyServerContacted": false,
+  "serverActionPerformed": false,
   "liveDatabaseIncluded": false,
-  "baseDatasetIncluded": false,
   "realCredentialsIncluded": false,
+  "baseDatasetIncluded": false,
   "installedDependenciesIncluded": false,
+  "startupMigrates": false,
   "automaticServerSetup": false,
   "requiresStoppedWriters": true,
   "requiresVerifiedNativeBackup": true,
-  "startupMigrates": false,
   "explicitUpgrades": [
     "postgresql-upgrade-8-to-9.sql",
     "postgresql-upgrade-9-to-10.sql"
   ],
-  "reviewGateSha256": "dd076eb02b0a76da2bdba155681576c9740e40fbedf14aa4cf8201d012b59a40",
-  "limitations": [
-    "Only completed EM reports with recorded productionStopped=true contribute. Durations are recorded sums; independent stop intervals do not exist, so overlap is not removed.",
-    "Line identity uses the current asset hall/line pair, not a frozen historical location or an inferred OEE event relationship.",
-    "Missing or invalid duration is unknown, distinct from measured zero; malformed report bodies are not treated as valid stoppages.",
-    "No live installation, company data, company Nginx, current company backup or actual Mehrabi/Abbaspour assignment was inspected by these local checks.",
-    "The two final17-case backend selections,123 frontend tests and38 browser checks are the r2 acceptance; earlier broad reports remain historical evidence, not a claim of rerunning the full legacy Windows installer suite.",
-    "Installed dependencies, private settings, live database and replacement PM seed are not packaged; preserve existing runtime data."
-  ],
+  "newMigrationSinceRevision2": false,
+  "entryPoint": "README.md",
+  "verification": "docs/operations-verification.json",
   "gzipPairsVerified": 25,
   "builtFontsVerified": [
     "frontend/dist/assets/Vazirmatn-Regular-CtGL0YI-.woff2",
@@ -43,8 +38,5 @@
   ],
   "requiredR2CapabilitiesVerified": [
     "em-downtime-drilldown"
-  ],
-  "historicalMetadata": {
-    "backend-patch.json": "CIP patch cip.1 history only; RELEASE.json is the rc.12 release contract."
-  }
+  ]
 }
