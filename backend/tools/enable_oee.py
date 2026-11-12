@@ -1,4 +1,4 @@
-"""Enable optional OEE module on core schema 8, after a native backup.
+"""Enable optional OEE module on current core schema 10, after a native backup.
 
 Explicit maintenance command only. Stop application writers first. Uses a
 protected local schema-owner TOML and a separate limited runtime account.

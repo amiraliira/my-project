@@ -1,4 +1,4 @@
--- Optional OEE module v1. Explicit additive owner migration on core schema 8.
+-- Optional OEE module v1. This rc12 delivery enables it on core schema 10.
 -- Run once in a transaction after a verified native backup. No existing rows modified.
 CREATE TABLE oee_module(version INTEGER PRIMARY KEY CHECK(version=1));
 CREATE TABLE oee_lines(

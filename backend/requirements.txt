@@ -1,4 +1,4 @@
-# Exact dependency versions used by rc10. Linux resolves its own platform wheels.
+# Exact dependency versions used by rc12. Linux resolves its own platform wheels.
 # This is a version pin list, not a Linux artifact-hash lock.
 annotated-doc==0.0.5
 annotated-types==0.8.0
