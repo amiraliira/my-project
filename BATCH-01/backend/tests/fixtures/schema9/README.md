@@ -1,0 +1,1 @@
+Frozen schema-9 fixture, captured before the schema-10 correction archive extension. Used only for explicit upgrade tests; never an application fallback. Production migration source remains the owner-run SQL.
