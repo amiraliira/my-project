@@ -1,3 +1,0 @@
-frontend/readme.md
-backend-patch.json
-docs/update-file-diff-rc12.json
