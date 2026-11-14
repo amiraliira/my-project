@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+*.dump
+*.pgpass
+*.key
+*.pfx
+server.toml
+owner*.toml
+backups/
+*.log
