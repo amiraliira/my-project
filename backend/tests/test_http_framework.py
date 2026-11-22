@@ -112,8 +112,8 @@ class HttpFrameworkTests(unittest.IsolatedAsyncioTestCase):
     async def test_real_framework_health_head_headers_and_static_resources(self):
         health = await self.client.get("/api/health")
         self.assertEqual(health.status_code, 200)
-        self.assertEqual(health.json()["apiVersion"], 7)
-        self.assertEqual(health.json()["schemaVersion"], 10)
+        self.assertEqual(health.json()["apiVersion"], 8)
+        self.assertEqual(health.json()["schemaVersion"], 12)
         self.assertEqual(health.json()["databaseProvider"], "postgresql")
         self.assertGreaterEqual(health.json()["databaseVersionNum"], 170000)
         self.assertEqual(health.json()["databaseVersion"], self.services.db.server_version)

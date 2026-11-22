@@ -351,7 +351,9 @@ VALUES(:order,2,'m1',1,1,'1','1',100,'individual')""", ({"order": f"load-order-{
                   "architecture": platform.machine(), "logicalCpuCount": os.cpu_count(), "reports": count,
                   "parts": count + 1, "seedSeconds": round(seed_seconds, 3), "measurements": metrics,
                   "limits": "In-process router/domain measurements against real isolated PostgreSQL with TLS and tracemalloc; excludes HTTP transport, company LAN latency, concurrent clients and browser rendering. Not a production capacity or speed claim."}
-        (PROJECT / "docs/synthetic-load-results.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        report_path = PROJECT / ".build/reports/synthetic-load-results.json"
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

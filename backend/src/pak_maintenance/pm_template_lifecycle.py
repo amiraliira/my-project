@@ -19,8 +19,8 @@ class TemplateLifecycleMixin:
             value=raw.strip()
             if len(value)>max or required and not value or any(ord(ch)<32 and ch not in "\r\n\t" for ch in value):raise ApiError(400,"اطلاعات برگه خالی یا بیش از حد مجاز است.")
             return value
-        title,hall,spec,period,code=field("title",200),field("hall",150),field("specialty",30),field("period",100),field("formCode",80,False)
-        if spec not in ("برق","مکانیک","تاسیسات"):raise ApiError(400,"تخصص برگه را انتخاب کنید.")
+        title,hall,spec,period,code=field("title",200),field("hall",150),field("specialty",200),field("period",100),field("formCode",80,False)
+        if any(ord(ch)<32 for ch in spec):raise ApiError(400,"نام واحد فنی باید در یک خط وارد شود.")
         cadence=schedule.read_period(period)
         if cadence.trigger_kind!="calendar" or cadence.interval_days is not None or not(cadence.period_class=="weekly" or cadence.interval_months is not None and 1<=cadence.interval_months<=120):raise ApiError(400,"دوره برگه باید هفتگی یا ماهانه تا ۱۲۰ ماه باشد.")
         activities=input.get("activities")

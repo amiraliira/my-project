@@ -121,6 +121,14 @@ class ReportingService:
         from .em_downtime import EmDowntimeReport
         return EmDowntimeReport(self.db, self.work).orders(viewer, start, end, hall, line, page, page_size)
 
+    def activities(self, viewer, start, end, kind=None, group_by=None, metric=None, page=None, page_size=None):
+        from .activity_reporting import ActivityReport
+        return ActivityReport(self.db, self.work).summary(viewer, start, end, kind, group_by, metric, page, page_size)
+
+    def activities_orders(self, viewer, start, end, hall, line=None, kind=None, group_by=None, metric=None, page=None, page_size=None):
+        from .activity_reporting import ActivityReport
+        return ActivityReport(self.db, self.work).orders(viewer, start, end, hall, line, kind, group_by, metric, page, page_size)
+
     def dashboard(self, viewer):
         from .work_service import WorkService
         WorkService._role(viewer)

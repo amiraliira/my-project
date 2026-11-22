@@ -114,7 +114,7 @@ class DatabaseDependencyError(RuntimeError):
 
 
 class SchemaMismatchError(RuntimeError):
-    """Existing schema does not match the service's required schema 9."""
+    """Existing schema does not match the service's required persistence contract."""
 
 
 class DatabaseCleanupError(RuntimeError):
@@ -375,7 +375,7 @@ class Connection:
 
 
 class Database:
-    schema_version = 10
+    schema_version = 12
 
     def __init__(self, config: DatabaseConfig | Mapping[str, Any]):
         self.config = config if isinstance(config, DatabaseConfig) else DatabaseConfig(**dict(config))
@@ -560,7 +560,7 @@ class Database:
         raise AssertionError("Transaction retry bounds were not enforced.")
 
     def verify_schema(self, *, require_guards: bool = True, runtime_role: bool = True) -> None:
-        """Inspect schema 10 without creating, migrating, seeding or repairing it."""
+        """Inspect the current schema without creating, migrating, seeding or repairing it."""
         if type(require_guards) is not bool:
             raise TypeError("The schema guard flag must be a boolean.")
         if type(runtime_role) is not bool:
@@ -571,8 +571,8 @@ class Database:
     def _verify_schema_connection(self, connection: Connection, *, require_guards: bool = True, runtime_role: bool = True, expected_version: int | None = None) -> None:
         """Verify within an owner migration transaction before its commit."""
         expected_version = self.schema_version if expected_version is None else expected_version
-        if expected_version not in (9, 10):
-            raise ValueError("Only the explicit schema-9 migration source or current schema-10 contract is supported")
+        if expected_version not in (9, 10, 11, 12):
+            raise ValueError("Only the explicit schema-9/10/11 migration sources or current schema-12 contract are supported")
         try:
             versions = connection.query("SELECT version FROM schema_version")
             if len(versions) != 1 or type(versions[0]["version"]) is not int or versions[0]["version"] != expected_version:
@@ -592,13 +592,13 @@ class Database:
                 if self.is_sqlite:
                     present = {row["name"] for row in connection.query("SELECT name FROM sqlite_master WHERE type='trigger'")}
                     required = _SQLITE_GUARDS
-                    if expected_version == 10 and 'supervisor-correction-snapshot' not in (connection.scalar("SELECT sql FROM sqlite_master WHERE type='table' AND name='pm_submission_archive'") or ''):
-                        raise SchemaMismatchError("Schema 10 requires the explicit supervisor-correction archive evidence contract.")
+                    if expected_version >= 10 and 'supervisor-correction-snapshot' not in (connection.scalar("SELECT sql FROM sqlite_master WHERE type='table' AND name='pm_submission_archive'") or ''):
+                        raise SchemaMismatchError("The current schema requires the explicit supervisor-correction archive evidence contract.")
                 else:
                     present = {row["name"] for row in connection.query("SELECT t.tgname AS name FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND NOT t.tgisinternal AND t.tgenabled IN ('O','A')")}
                     required = _POSTGRESQL_GUARDS
-                    if expected_version == 10 and not connection.scalar("SELECT COUNT(*) FROM pg_constraint WHERE conrelid='public.pm_submission_archive'::regclass AND contype='c' AND convalidated AND pg_get_constraintdef(oid) LIKE '%supervisor-correction-snapshot%'"):
-                        raise SchemaMismatchError("Schema 10 requires the validated supervisor-correction archive evidence constraint.")
+                    if expected_version >= 10 and not connection.scalar("SELECT COUNT(*) FROM pg_constraint WHERE conrelid='public.pm_submission_archive'::regclass AND contype='c' AND convalidated AND pg_get_constraintdef(oid) LIKE '%supervisor-correction-snapshot%'"):
+                        raise SchemaMismatchError("The current schema requires the validated supervisor-correction archive evidence constraint.")
                     types = {row["table_name"]: row["data_type"] for row in connection.query("SELECT table_name,data_type FROM information_schema.columns WHERE table_schema='public' AND column_name='quantity_units'")}
                     if any(types.get(table) != "bigint" for table in ("order_parts", "stock_movements", "part_consumptions", "part_consumption_totals")):
                         raise SchemaMismatchError("PostgreSQL quantity evidence requires signed 64-bit integer columns.")
@@ -641,6 +641,12 @@ class Database:
                     required = required - {'guard_pm_archive_correction_insert'}
                 if not required <= present:
                     raise SchemaMismatchError("Required immutable-history and quantity guards are missing. Apply the reviewed initialization/migration SQL before running this software.")
+                if expected_version >= 11:
+                    from .pm_routing_contract import verify_routing_contract
+                    verify_routing_contract(connection)
+                if expected_version >= 12:
+                    from .work_category_contract import verify_work_category_contract
+                    verify_work_category_contract(connection)
         except Exception as error:
             driver_error = not self.is_sqlite and self._driver is not None and isinstance(error, self._driver.Error)
             if isinstance(error, (sqlite3.DatabaseError, KeyError)) or driver_error:

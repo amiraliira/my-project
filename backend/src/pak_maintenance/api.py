@@ -1,4 +1,4 @@
-"""Framework-independent API 7 bindings and explicit route authorization.
+"""Framework-independent API 8 bindings and explicit route authorization.
 
 Only the adapter in application.py knows FastAPI. Domain calls, session cookies,
 strict input parsing and route scopes can therefore be tested without a server.
@@ -10,12 +10,15 @@ import re
 import sqlite3
 from typing import Any
 
-from . import __version__
+from . import __version__, __package_revision__
 from .common import ApiError, dumps, loads
 from .security import COOKIE, require
 from .permissions import CHIEFS, PM_PROPOSERS, PERSONNEL_ADMINISTRATORS
 
 CAPABILITIES = (
+    "personnel-activity-drilldown", "pm-routing-review",
+    "work-categories-v1", "activity-reporting-v1",
+    "pm-responsibility-cross-team",
     "em-downtime-drilldown",
     "workflow-inbox", "participant-grading", "technician-registration", "performance-reports",
     "scalable-lists", "cursor-reports", "paged-catalogs", "versioned-pm-sheets", "persian-weekly-pm", "equipment-pm-calendar",
@@ -240,7 +243,12 @@ class Api:
     def _bind(self):
         self.add("POST", "/api/pm/templates/{id}/preview-activities", lambda r, u, id: self.services.pm.preview_activities(u, id, r.json()), roles=(*CHIEFS, *PM_PROPOSERS))
         self.add("GET", "/api/pm/tasks/{id}/responsibility", lambda r, u, id: self.services.pm.responsibility(u, id), roles=("head", "manager"))
+        self.add("GET", "/api/pm/routing-review", lambda r, u: self.services.pm.routing_review(
+            u, r.query.get("targetId", ""), r.query.get("sourceId", ""), r.query.get("specialty", ""),
+            r.query.get("section", "plans"), r.integer("page"), r.integer("pageSize")), roles=("head", "manager"))
         self.add("POST", "/api/pm/tasks/{id}/responsibility", lambda r, u, id: self.services.pm.transfer_responsibility(u, id, r.json()), roles=("head", "manager"))
+        self.add("POST", "/api/pm/plans/{id}/responsibility", lambda r, u, id:
+                 self.services.pm.transfer_plan_responsibility(u, id, r.json()), roles=CHIEFS)
         self.add("GET", "/api/pm/templates/{id}/pdf", self.pm_pdf, roles=("head", "manager", "planner", "admin", "supervisor"))
         self.add("POST", "/api/parts/import/preview", self.parts_import, roles=("admin", "head", "manager", "planner"))
         self.add("POST", "/api/parts/import/apply", lambda r, u: self.parts_import(r, u, True), roles=("admin", "head", "manager", "planner"))
@@ -249,7 +257,7 @@ class Api:
         management = ("admin", "head", "manager", "planner")
         inbox_roles = ("supervisor", "planner", "head", "manager", "admin")
         add("GET", "/api/health", lambda r, u: {"status": "ok", "database": self.config.database.provider,
-            "version": __version__, "apiVersion": 7, "schemaVersion": 10,
+            "version": __version__, "packageRevision": __package_revision__, "apiVersion": 8, "schemaVersion": 12,
             "databaseProvider": self.config.database.provider,
             "databaseVersionNum": s.db.server_version_num,
             "databaseVersion": s.db.server_version,
@@ -279,7 +287,25 @@ class Api:
         add("GET", "/api/performance", lambda r, u: s.performance.report(u, r.query.get("period"), r.integer("year"),
             r.integer("month"), r.query.get("personId"), r.integer("detailPage"), r.integer("detailPageSize"),
             scope=r.query.get("scope")), registration=True)
+        add("GET", "/api/performance/halls", lambda r, u: s.performance.hall_report(u,
+            kind=r.query.get("period"), year=r.integer("year"), month=r.integer("month"),
+            person_id=r.query.get("personId"), page=r.integer("page"), page_size=r.integer("pageSize")),
+            registration=True)
+        add("GET", "/api/performance/halls/activities", lambda r, u: s.performance.hall_report(u,
+            kind=r.query.get("period"), year=r.integer("year"), month=r.integer("month"),
+            person_id=r.query.get("personId"), hall=r.query.get("hall"),
+            page=r.integer("page"), page_size=r.integer("pageSize"), activities=True),
+            registration=True)
         add("GET", "/api/dashboard", lambda r, u: s.reporting.dashboard(u))
+        add("GET", "/api/reports/activities", lambda r, u: s.reporting.activities(u,
+            r.query.get("from"), r.query.get("to"), r.query.get("type"), r.query.get("groupBy"),
+            r.query.get("metric"), r.integer("page"), r.integer("pageSize")),
+            roles=("head", "manager", "planner", "supervisor", "technician"), registration=True)
+        add("GET", "/api/reports/activities/orders", lambda r, u: s.reporting.activities_orders(u,
+            r.query.get("from"), r.query.get("to"), r.query.get("hall"), r.query.get("line"),
+            r.query.get("type"), r.query.get("groupBy"), r.query.get("metric"),
+            r.integer("page"), r.integer("pageSize")),
+            roles=("head", "manager", "planner", "supervisor", "technician"), registration=True)
         add("GET", "/api/reports/em-downtime", lambda r, u: s.reporting.em_downtime(u,
             r.query.get("from"), r.query.get("to"), r.integer("page"), r.integer("pageSize")),
             roles=("head", "manager", "planner", "supervisor", "technician"), registration=True)

@@ -56,8 +56,9 @@ class PartsImportTests(unittest.TestCase):
         self.directory.mkdir(parents=True)
         path = self.directory / 'fixture.db'
         schema_root = Path(__file__).parents[1] / 'schema'
-        schema = (schema_root / 'sqlite-v10.sql').read_text(encoding='utf-8')
+        schema = (schema_root / 'sqlite-v12.sql').read_text(encoding='utf-8')
         schema += '\n' + '\n'.join(item.read_text(encoding='utf-8') for item in sorted(schema_root.glob('sqlite-*-guards.sql')))
+        schema += '\n' + (schema_root / 'sqlite-pm-routing-v11.sql').read_text(encoding='utf-8')
         raw = sqlite3.connect(path)
         try:
             raw.executescript(schema)

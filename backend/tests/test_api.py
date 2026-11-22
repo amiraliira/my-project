@@ -106,8 +106,14 @@ class RouteTests(unittest.TestCase):
         self.auth.authenticate.return_value = None
         result = self.api.dispatch(Request("GET", "/api/health"))
         self.assertFalse(result.payload["productionAccepted"])
-        self.assertEqual(result.payload["apiVersion"], 7)
-        self.assertEqual(result.payload["schemaVersion"], 10)
+        self.assertEqual(result.payload["apiVersion"], 8)
+        self.assertEqual(result.payload["schemaVersion"], 12)
+        self.assertEqual(result.payload["packageRevision"], 2)
+        self.assertIn("personnel-activity-drilldown", result.payload["implementedCapabilities"])
+        self.assertIn("pm-routing-review", result.payload["implementedCapabilities"])
+        self.assertIn("work-categories-v1", result.payload["implementedCapabilities"])
+        self.assertIn("activity-reporting-v1", result.payload["implementedCapabilities"])
+        self.assertIn('pm-responsibility-cross-team', result.payload['capabilities'])
         self.auth.authenticate.assert_not_called()
 
     def test_catalog_closures_bind_separate_kinds_and_tech_can_get_own_tasks(self):

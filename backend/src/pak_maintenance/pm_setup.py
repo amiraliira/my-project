@@ -37,10 +37,9 @@ class PmSetupService:
                     if not codes or any(code not in assets for code in codes):reasons.append("تجهیز یا فهرست کامل دستگاه‌های برگه تعیین نشده است.")
                     else:asset_id=assets[codes[0]]["id"]
                 elif not asset_id or asset_id not in asset_ids:reasons.append("تجهیز معتبر برنامه تعیین نشده است.")
-                owners=[s for s in supervisors if s["specialty"]==row["specialty"]];owner=row.get("supervisor_id");owner_name=None
-                if owner:owner_name=next((s["name"] for s in owners if s["id"]==owner),None)
-                elif len(owners)==1:owner=owners[0]["id"];owner_name=owners[0]["name"]
-                if not owner or not owner_name:reasons.append("سرپرست همین واحد باید انتخاب شود.")
+                owner=row.get("supervisor_id");owner_name=None
+                if owner:owner_name=next((s["name"] for s in supervisors if s["id"]==owner and s["specialty"].strip()),None)
+                if not owner or not owner_name:reasons.append("سرپرست مسئول و تیم انجام باید صریح انتخاب شود.")
                 period=info.period(template);periodic=schedule.source_period(plan)
                 if period.meter_hours is not None and (not confirmed or plan.get("recurrence",{}).get("meterPolicy")!="calendar-only"):reasons.append("مبنای برگهٔ دارای ساعت دستگاه باید توسط رئیس تعیین شود.")
                 if template.get("calendarEligible") is False and not periodic:reasons.append("مبنای تقویمی این برگه هنوز تأیید نشده است.")

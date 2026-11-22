@@ -491,9 +491,10 @@ class PostgreSQLBoundaryTests(unittest.TestCase):
 
 
 class SchemaInspectionTests(unittest.TestCase):
-    def test_exported_data_free_schema10_is_verified_without_mutation(self):
-        schema = (Path(__file__).resolve().parents[1] / "schema" / "sqlite-v10.sql").read_text(encoding="utf-8")
+    def test_exported_data_free_schema12_is_verified_without_mutation(self):
+        schema = (Path(__file__).resolve().parents[1] / "schema" / "sqlite-v12.sql").read_text(encoding="utf-8")
         schema += "\n" + "\n".join(path.read_text(encoding="utf-8") for path in sorted((Path(__file__).resolve().parents[1] / "schema").glob("sqlite-*-guards.sql")))
+        schema += "\n" + (Path(__file__).resolve().parents[1] / "schema" / "sqlite-pm-routing-v11.sql").read_text(encoding="utf-8")
         with fixture_directory() as directory:
             path = directory / "fixture.db"
             create_fixture(path, schema)
@@ -506,8 +507,9 @@ class SchemaInspectionTests(unittest.TestCase):
                 self.assertEqual(connection.scalar("SELECT COUNT(*) FROM orders"), 0)
 
     def test_missing_score_evidence_and_returned_stock_columns_fail_schema_gate(self):
-        schema = (Path(__file__).resolve().parents[1] / "schema" / "sqlite-v10.sql").read_text(encoding="utf-8")
+        schema = (Path(__file__).resolve().parents[1] / "schema" / "sqlite-v12.sql").read_text(encoding="utf-8")
         schema += "\n" + "\n".join(path.read_text(encoding="utf-8") for path in sorted((Path(__file__).resolve().parents[1] / "schema").glob("sqlite-*-guards.sql")))
+        schema += "\n" + (Path(__file__).resolve().parents[1] / "schema" / "sqlite-pm-routing-v11.sql").read_text(encoding="utf-8")
         for mutation in ("DROP TABLE completed_scores", "ALTER TABLE parts ADD COLUMN stock INTEGER"):
             with self.subTest(mutation=mutation), fixture_directory() as directory:
                 path = directory / "fixture.db"

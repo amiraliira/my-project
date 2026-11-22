@@ -107,7 +107,7 @@ class OeeServiceCase(unittest.TestCase):
         self.assertTrue(result['alreadyApplied'])
         with self.owner.connect() as c:
             self.assertEqual(c.scalar('SELECT COUNT(*) FROM oee_sheets'),1)
-            self.assertEqual(c.scalar('SELECT version FROM schema_version'),10)
+            self.assertEqual(c.scalar('SELECT version FROM schema_version'),12)
         with self.assertRaises(Exception):
             with self.services.db.transaction() as c:c.execute('DELETE FROM oee_sheets WHERE id=:id',dict(id=sheet['id']))
 

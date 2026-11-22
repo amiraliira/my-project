@@ -100,7 +100,7 @@ class PmActivityPublicationTests(unittest.TestCase):
         self.directory.mkdir(parents=True)
         self.path = self.directory / "synthetic.db"
         raw = sqlite3.connect(self.path)
-        for script in (ROOT / "schema" / "sqlite-v10.sql", *sorted((ROOT / "schema").glob("sqlite-*-guards.sql"))):
+        for script in (ROOT / "schema" / "sqlite-v12.sql", *sorted((ROOT / "schema").glob("sqlite-*-guards.sql")), ROOT / "schema" / "sqlite-pm-routing-v11.sql"):
             raw.executescript(script.read_text(encoding="utf-8-sig"))
         raw.close()
         self.db = Database(DatabaseConfig(provider="sqlite", database=str(self.path), development=True))

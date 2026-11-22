@@ -16,6 +16,7 @@ def check(*, config=False):
     required = (
         "app/__init__.py", "app/main.py", "app/settings.py", "pyproject.toml",
         "requirements.txt", "src/pak_maintenance/__init__.py",
+        "src/pak_maintenance/settings.py",
         "src/pak_maintenance/application.py", "src/pak_maintenance/api.py",
         "schema/release-policy.json",
     )
@@ -59,11 +60,31 @@ def check(*, config=False):
     print("[OK] Pinned runtime dependencies are installed in this interpreter.")
     if config:
         try:
-            from app.settings import load_config
+            from pak_maintenance.settings import SettingsError, configuration_source, load_config
+            from pak_maintenance.database import DatabaseConfigurationError
+            from pak_maintenance.network_policy import NetworkPolicyError
+        except ImportError:
+            return ["Configuration modules could not be imported. Verify the complete matching source and installed dependencies."]
+        try:
+            source = configuration_source()
+            selection = "PAK_ENV_FILE" if source.explicit else "default backend/.env"
+            print(f"[INFO] Configuration file ({selection}): {source.path}")
+            print("[INFO] Configuration file exists: " + ("yes" if source.file_exists else "no"))
+            print("[INFO] Process environment settings (override file): " +
+                  (", ".join(source.environment_settings) or "none"))
             settings = load_config()
-        except (ImportError, ValueError, OSError):
-            # Do not echo arbitrary filesystem/OS exception text from private paths.
-            return ["Configuration validation failed. Check the private .env against .env.example and README.md; values were not printed."]
+        except SettingsError as error:
+            return [str(error)]
+        except (DatabaseConfigurationError, NetworkPolicyError) as error:
+            # These validators emit controlled policy text, never supplied values.
+            return [str(error)]
+        except OSError:
+            return ["Cannot read the selected configuration file. Check PAK_ENV_FILE, file existence and read permissions."]
+        except (ImportError, ValueError):
+            # Unknown third-party/OS errors may contain input; do not echo them.
+            return ["Application configuration validation failed. Check public URL, runtime paths and backup settings against README.md; private values were not printed."]
+        print("[INFO] Configured PostgreSQL login: " + settings.database.user)
+        print("[INFO] Database login privileges and schema are checked at application startup, not by this local preflight.")
         if not (Path(settings.seed_directory) / "pm-import.json").is_file():
             errors.append("PAK_PM_SEED_DIR must contain the existing pm-import.json file.")
         if not (Path(settings.seed_directory) / "pm-originals").is_dir():
@@ -75,7 +96,7 @@ def check(*, config=False):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", action="store_true", help="Also validate the private .env and existing PM seed paths; never prints values")
+    parser.add_argument("--config", action="store_true", help="Also validate the selected private file and PM paths; show source, override names and database login, never passwords")
     arguments = parser.parse_args()
     print("Interpreter: " + sys.executable)
     errors = check(config=arguments.config)

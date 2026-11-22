@@ -29,5 +29,5 @@ def enable_oee(database, *, runtime_user):
         c.execute(f'GRANT SELECT ON oee_module TO "{runtime_user}"')
         c.execute(f'GRANT SELECT,INSERT,UPDATE ON oee_lines,oee_sheets TO "{runtime_user}"')
         c.execute(f'GRANT SELECT,INSERT ON oee_sheet_revisions TO "{runtime_user}"')
-        return dict(module='oee',version=1,coreSchemaVersion=10,alreadyApplied=present,existingDataReset=False)
+        return dict(module='oee',version=1,coreSchemaVersion=database.schema_version,alreadyApplied=present,existingDataReset=False)
     return database.run_transaction(operation)

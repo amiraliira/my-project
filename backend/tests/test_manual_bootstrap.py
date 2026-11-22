@@ -25,7 +25,7 @@ class ManualBootstrapCase(unittest.TestCase):
 
     def test_delivered_source_import_needs_no_settings_or_database(self):
         result = self.run_python("import app, pak_maintenance, sys; "
-            "assert pak_maintenance.__version__ == '2.0.0rc12'; "
+            "assert pak_maintenance.__version__ == '2.0.0rc13'; "
             "assert 'app.settings' not in sys.modules; "
             "assert 'pak_maintenance.database' not in sys.modules; "
             "print(pak_maintenance.__file__)")

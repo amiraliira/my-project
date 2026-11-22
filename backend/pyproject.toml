@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pak-maintenance"
-version = "2.0.0rc12"
+version = "2.0.0rc13"
 description = "Internal-network maintenance and repair management for PAK"
 requires-python = ">=3.12"
 dependencies = [

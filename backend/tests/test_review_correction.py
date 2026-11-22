@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ReviewCorrectionTests(unittest.TestCase):
-    schema = (ROOT / 'schema/sqlite-v10.sql').read_text(encoding='utf-8') + '\n' + supervisor.GUARDS
+    schema = (ROOT / 'schema/sqlite-v12.sql').read_text(encoding='utf-8') + '\n' + supervisor.GUARDS
     tearDown = fixtures.WorkflowCase.tearDown
     body = fixtures.WorkflowCase.body
     grade = fixtures.WorkflowCase.grade

@@ -12,6 +12,7 @@ from .score_facts import participant_score, round_score, stored_decimal, decimal
 from .consumption_service import capture as capture_consumption
 from .pm_responsibility import effective_owner, owner_sql, execution_started
 from .work_review_correction import ReviewCorrectionMixin
+from .work_categories import WORK_TYPES, general_hall_target, is_general_asset
 
 ROLES = {"technician", "supervisor", "planner", "head", "manager", "admin"}
 
@@ -193,7 +194,7 @@ OR NOT EXISTS(SELECT 1 FROM approvals a WHERE a.order_id=p.order_id AND a.revisi
 
     @staticmethod
     def filters(args, type=None, status=None, asset_id=None, hall=None, overdue=False):
-        if type and type not in {"PM", "EM", "PROJECT"}:
+        if type and type not in WORK_TYPES:
             raise ApiError(400, "نوع کار نامعتبر است.")
         if len(status or "") > 30 or len(asset_id or "") > 100 or len(hall or "") > 100:
             raise ApiError(400, "فیلتر کار نامعتبر است.")
@@ -228,7 +229,7 @@ OR NOT EXISTS(SELECT 1 FROM approvals a WHERE a.order_id=p.order_id AND a.revisi
         scope = self.decision_scope(user)
         filters = self.filters(args, type=type, hall=hall, overdue=overdue)
         with self.db.transaction(write=False) as c:
-            counts = c.one("SELECT COUNT(*) AS total,COALESCE(SUM(CASE WHEN o.type='PM' THEN 1 ELSE 0 END),0) AS pm,COALESCE(SUM(CASE WHEN o.type='EM' THEN 1 ELSE 0 END),0) AS em,COALESCE(SUM(CASE WHEN o.type='PROJECT' THEN 1 ELSE 0 END),0) AS project,COALESCE(SUM(CASE WHEN o.due_date IS NOT NULL AND o.due_date<:today THEN 1 ELSE 0 END),0) AS overdue FROM orders o WHERE " + scope, args)
+            counts = c.one("SELECT COUNT(*) AS total,COALESCE(SUM(CASE WHEN o.type='PM' THEN 1 ELSE 0 END),0) AS pm,COALESCE(SUM(CASE WHEN o.type='EM' THEN 1 ELSE 0 END),0) AS em,COALESCE(SUM(CASE WHEN o.type='PROJECT' THEN 1 ELSE 0 END),0) AS project,COALESCE(SUM(CASE WHEN o.type='CM' THEN 1 ELSE 0 END),0) AS cm,COALESCE(SUM(CASE WHEN o.type='GENERAL' THEN 1 ELSE 0 END),0) AS general,COALESCE(SUM(CASE WHEN o.due_date IS NOT NULL AND o.due_date<:today THEN 1 ELSE 0 END),0) AS overdue FROM orders o WHERE " + scope, args)
             total = c.scalar("SELECT COUNT(*) FROM orders o WHERE " + scope + filters, args)
             orders = self.view_batch(c, c.query("SELECT o.* FROM orders o WHERE " + scope + filters + " ORDER BY o.updated_at,o.created_at,o.id LIMIT :size OFFSET :offset", args), user)
         return {"orders": orders, "total": total, "page": page, "pageSize": size, "totalPages": (total + size - 1) // size,
@@ -252,7 +253,7 @@ OR NOT EXISTS(SELECT 1 FROM approvals a WHERE a.order_id=p.order_id AND a.revisi
                 raise ApiError(413, "کارتابل بزرگ است؛ از نسخه جدید با صفحه‌بندی استفاده کنید.")
             rows = c.query("SELECT o.* FROM orders o WHERE " + scope + " ORDER BY o.updated_at,o.created_at,o.id", args)
             orders = [item for start in range(0, len(rows), 100) for item in self.view_batch(c, rows[start:start + 100], user)]
-        counts = {"total": len(orders), "pm": sum(o["type"] == "PM" for o in orders), "em": sum(o["type"] == "EM" for o in orders), "project": sum(o["type"] == "PROJECT" for o in orders), "overdue": sum(bool(o.get("dueDate")) and o["dueDate"] < today() for o in orders)}
+        counts = {"total": len(orders), "pm": sum(o["type"] == "PM" for o in orders), "em": sum(o["type"] == "EM" for o in orders), "project": sum(o["type"] == "PROJECT" for o in orders), "cm": sum(o["type"] == "CM" for o in orders), "general": sum(o["type"] == "GENERAL" for o in orders), "overdue": sum(bool(o.get("dueDate")) and o["dueDate"] < today() for o in orders)}
         return {"orders": orders, "counts": counts, "stage": "supervisor" if user.role == "supervisor" else "head" if user.role == "head" else None, "specialty": user.specialty if user.role == "supervisor" else None}
 
     def export(self, user, type=None, status=None, q=None, asset_id=None):
@@ -299,7 +300,7 @@ OR NOT EXISTS(SELECT 1 FROM approvals a WHERE a.order_id=p.order_id AND a.revisi
                 "grades": grouped("SELECT s.*,u.name AS actor_name FROM participant_scores s JOIN users u ON u.id=s.actor_id JOIN orders o ON o.id=s.order_id AND o.workflow_revision=s.revision WHERE s.order_id IN " + membership + " ORDER BY s.order_id,s.person_id"),
                 "policies": grouped("SELECT gp.* FROM participant_grading_policies gp JOIN orders o ON o.id=gp.order_id AND o.workflow_revision=gp.revision WHERE gp.order_id IN " + membership),
                 "head_grades": grouped("SELECT s.*,u.name AS actor_name FROM participant_head_scores s JOIN users u ON u.id=s.actor_id JOIN orders o ON o.id=s.order_id AND o.workflow_revision=s.revision WHERE s.order_id IN " + membership + " ORDER BY s.order_id,s.person_id"),
-                "occurrences": {row["order_id"]: row for row in c.query("SELECT p.order_id,p.supervisor_id,p.end_utc,p.executed_at,p.submitted_at," + owner_sql("p") + " AS effective_supervisor_id FROM pm_weekly_occurrences p WHERE p.order_id IN " + membership, args)}}
+                "occurrences": {row["order_id"]: row for row in c.query("SELECT p.order_id,p.supervisor_id,p.end_utc,p.executed_at,p.submitted_at," + owner_sql("p") + " AS effective_supervisor_id,execution_owner.specialty AS execution_specialty FROM pm_weekly_occurrences p LEFT JOIN users execution_owner ON execution_owner.id=" + owner_sql("p") + " WHERE p.order_id IN " + membership, args)}}
 
     def view_batch(self, c, rows, user):
         data = self._load_views(c, rows)
@@ -366,7 +367,7 @@ OR NOT EXISTS(SELECT 1 FROM approvals a WHERE a.order_id=p.order_id AND a.revisi
         occurrence = data["occurrences"].get(identifier)
         can_edit = user is not None and row["status"] in {"draft", "returned"} and (self.management(user) or user.role == "planner" or user.id in {row["created_by"], row["assignee_id"]} or user.role == "supervisor" and (any(p["specialty"] == user.specialty for p in participants) or assignee and assignee["specialty"] == user.specialty))
         if occurrence:
-            j.update(pmOriginalSupervisorId=occurrence["supervisor_id"], pmEffectiveSupervisorId=occurrence["effective_supervisor_id"],
+            j.update(pmOriginalSupervisorId=occurrence["supervisor_id"], pmEffectiveSupervisorId=occurrence["effective_supervisor_id"], pmExecutionSpecialty=occurrence["execution_specialty"],
                      pmCanTransferResponsibility=bool(user and user.active and user.role in {"head", "manager"} and not execution_started(row, occurrence, j, participants, approvals)))
             can_edit = bool(can_edit and user.role == "technician" and row["assignee_id"] == user.id)
             deadline = datetime.fromisoformat(occurrence["end_utc"].replace("Z", "+00:00"))
@@ -440,10 +441,18 @@ OR NOT EXISTS(SELECT 1 FROM approvals a WHERE a.order_id=p.order_id AND a.revisi
         participant_items = items(body, "participants", 3 if user.role == "technician" else 20)
         part_items, checklist_items = items(body, "parts", 200), items(body, "checklist", 200)
         kind, asset = text(body, "type", 20), text(body, "assetId", 60)
-        if kind not in {"PM", "EM", "PROJECT"}:
+        if kind not in WORK_TYPES:
             raise ApiError(400, "نوع کار نامعتبر است.")
-        if not c.scalar("SELECT COUNT(*) FROM assets WHERE id=:id", {"id": asset}):
+        hall = text(body, 'hall', 100) if kind == 'GENERAL' else ''
+        if kind == 'GENERAL' and not asset:
+            asset = general_hall_target(c, hall)
+        asset_record = c.one('SELECT id,code,name,hall,line FROM assets WHERE id=:id', {'id': asset})
+        if asset_record is None:
             raise ApiError(400, "دستگاه معتبر انتخاب کنید.")
+        if kind == 'GENERAL' and (not is_general_asset(asset_record) or hall and asset_record['hall'] != hall):
+            raise ApiError(400, 'امور محوله را برای یک سالن و بدون انتخاب تجهیز ثبت کنید.')
+        if kind == 'CM' and is_general_asset(asset_record):
+            raise ApiError(400, 'برای تعمیرات اصلاحی یک تجهیز انتخاب کنید. کارهای بدون تجهیز در امور محوله ثبت می‌شوند.')
         title, description = text(body, "title", 300), text(body, "description", 10000)
         if len(title) < 3:
             raise ApiError(400, "عنوان کار حداقل سه نویسه باشد.")

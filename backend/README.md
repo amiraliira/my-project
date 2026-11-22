@@ -1,79 +1,76 @@
 # Backend
 
-[Project README](../README.md) | [Database](schema/README.md) | [OEE](oee/README.md) | [Runtime data](../docs/runtime-data/README.md)
+[Start](../README.md) · [Update procedure](../deploy/README.md) · [Database](schema/README.md) · [OEE](oee/README.md) · [Runtime data](../docs/runtime-data/README.md)
 
-Normal FastAPI, started manually with Uvicorn. Use one complete backend release. This release requires **API 7 / core schema 10**, with optional **OEE module 1**. Source code, Python environment, private settings and the database are separate.
+This is the authoritative manual FastAPI runbook. Examples use the existing Linux account `pak`, active source `~/Desktop/backend`, Python environment `~/Desktop/venv`, and private configuration `~/Desktop/PAK-data/backend.env`.
 
-## 1. Verify the source
-
-Extract beside the old installation, not over it:
-
-```sh
-cd "$HOME/Desktop/PAK-rc12"
-python3 -B tools/verify_source.py
-```
-
-Expect `"successful": true` and `"handoffRevision": 3`. This verifies the source package, not the database.
+## Source structure
 
 ```text
 backend/
   app/
-    __init__.py             # Selects this release's domain package
-    main.py                 # app.main:app Uvicorn entry point
-    settings.py             # Private .env parsing
+    __init__.py                  source-package selection and integrity guard
+    main.py                      public ASGI entry point: app.main:app
+    settings.py                  compatibility import for existing callers
   src/pak_maintenance/
-    __init__.py             # Defines __version__; must not be empty
-    application.py          # FastAPI factory and startup validation
-    api.py                  # API routes and capabilities
-  schema/README.md          # Database preservation and upgrades
-  oee/README.md             # Optional OEE activation
-  tools/check_installation.py
-  requirements.txt
-  pyproject.toml
+    __init__.py                  application version
+    settings.py                  literal configuration parsing and validation
+    application.py               FastAPI factory and lifecycle
+    api.py                       routes and capabilities
+    database.py                  transactions, schema and privilege checks
+    ...                          work, PM, parts, performance and OEE services
+  schema/README.md                database operations and migration decisions
+  oee/README.md                   optional module operations
+  tools/check_installation.py     local preflight
+  tests/                         generated fixtures and regression tests
+  requirements.txt               runtime dependency pins
+  pyproject.toml                  Python package metadata
 ```
 
-Preserve both `__init__.py` files. Do not flatten directories or copy only selected Python files. `src/pak_maintenance/` contains business source, not runtime data.
+Keep this layout intact, including both package initialization files. Do not run from `src/pak_maintenance/`. Architecture and development rules are in the [developer guide](../docs/development/README.md).
 
-## 2. Prepare the Python environment
+## 1. Activate the environment
 
-Use installed Python 3.12 or newer. Create this dedicated environment once and reuse it; keep the old environment available for rollback:
+For the existing installation:
 
 ```sh
-python3 --version
-python3 -m venv "$HOME/Desktop/PAK-venv-rc12"
-source "$HOME/Desktop/PAK-venv-rc12/bin/activate"
-cd "$HOME/Desktop/PAK-rc12/backend"
+source "$HOME/Desktop/venv/bin/activate"
+cd "$HOME/Desktop/backend"
+python --version
+python -m pip check
+```
+
+Python must be 3.12 or newer. For a new installation only, create the environment once with `python3 -m venv "$HOME/Desktop/venv"`. Install a release's dependency pins when needed:
+
+```sh
 python -m pip install -r requirements.txt
 python -m pip check
-python -B tools/check_installation.py
 ```
 
-Expect no broken pip requirements and preflight showing `2.0.0rc12`, this release's `src/pak_maintenance/__init__.py`, and `[OK] Local preflight passed`. Preflight reads local files and installed metadata; it never connects to PostgreSQL.
+Do not recreate a working environment for every restart. Keep the previous environment or its dependency state available during an update.
 
-## 3. Preserve and select the configuration
+## 2. Select the private configuration
 
-Reuse the **currently active** private configuration. Do not replace it with `.env.example`. If the old process used `PAK_ENV_FILE`, that selected file takes precedence over its backend `.env`; identify the correct file first. Never share or upload its contents.
+Use the existing, working `backend.env`. For a new installation only, copy `.env.example` to a private file and fill its values. Never replace working credentials with template placeholders.
 
-To centralize a confirmed active file from the reported old location, run this **once**:
-
-```sh
-mkdir -p "$HOME/Desktop/PAK-data"
-chmod 700 "$HOME/Desktop/PAK-data"
-test ! -e "$HOME/Desktop/PAK-data/backend.env" && install -m 600 "$HOME/Desktop/backend/.env" "$HOME/Desktop/PAK-data/backend.env"
-```
-
-If `backend.env` already exists the last command intentionally does not replace it. Review that existing file instead. If the confirmed active file is elsewhere, use its actual path as the copy source. The old file stays intact for rollback.
-
-Select the centralized configuration in every new shell before Uvicorn:
+In every new terminal that will run the backend:
 
 ```sh
 export PAK_ENV_FILE="$HOME/Desktop/PAK-data/backend.env"
-nano "$PAK_ENV_FILE"
 ```
 
-For a genuinely new installation only, copy `.env.example` to a private file and fill real values. The existing installation must keep its actual database password and paths.
+The selected file must exist. If `PAK_ENV_FILE` is unset, the legacy fallback is `backend/.env`; `backend.env` is not discovered automatically. Use one explicit file for this installation.
 
-For the reported same-host Docker/HTTP setup these are the relevant **non-secret** settings; retain the existing `PAK_DB_PASSWORD` privately:
+Configuration precedence is **exported `PAK_*` setting > selected file > code default**. An old terminal export can therefore override a corrected file. The preflight reports the selected source and override names. If stale database exports are present, clear them, keeping `PAK_ENV_FILE`:
+
+```sh
+unset PAK_DB_HOST PAK_DB_PORT PAK_DB_NAME PAK_DB_USER PAK_DB_PASSWORD
+unset PAK_DB_SSLMODE PAK_DB_SSLROOTCERT PAK_DB_ALLOW_LOOPBACK_PLAINTEXT PAK_DB_ALLOW_LAN_PLAINTEXT PAK_DB_CONNECT_TIMEOUT
+```
+
+Clear other exported settings only if the preflight identifies them as unwanted overrides. Do not `source`, execute, or use `set -a` on `backend.env`. Its parser treats values literally; shell evaluation can alter passwords or execute characters inside them.
+
+The reported same-host HTTP/Docker installation uses this non-secret profile. Keep the actual password privately and preserve approved scheduling/backup settings:
 
 ```dotenv
 PAK_PUBLIC_URL=http://192.168.12.92
@@ -89,97 +86,84 @@ PAK_DB_SSLROOTCERT=
 PAK_PM_SEED_DIR=~/Desktop/PAK-data/seed
 PAK_BACKUP_DIR=~/Desktop/PAK-data/backups
 PAK_DEVELOPMENT=false
-PAK_SCHEDULING_ENABLED=false
-PAK_AUTOMATIC_BACKUP_ENABLED=false
 ```
 
-Keep each setting once. Matching outer quotes are removed; values remain literal. No inline comments, shell `export` lines or variable expansion inside the file. Only seed/backup paths expand `~/`. Do not shell-source the file. Exported shell settings override file values; remove stale `PAK_DB_*` exports if they conflict.
+`pak` is the PostgreSQL runtime login, not the website admin account. It must be a limited role. Its password is different from the PostgreSQL maintenance account's password. Review role problems using the [database guide](schema/README.md), rather than weakening startup checks.
 
-`127.0.0.1` is the database address **from the Uvicorn machine**. Another machine requires its own transport profile from `.env.example`. Database role `pak` is unrelated to the website admin account.
-
-Validate without a database connection:
+## 3. Run the local preflight
 
 ```sh
 python -B tools/check_installation.py --config
 ```
 
-Expect configuration and existing PM paths to pass. An empty seed directory is insufficient: both `pm-import.json` and `pm-originals/` are required. See [runtime data](../docs/runtime-data/README.md).
+Expect source version `2.0.0rc13`, this backend's package path, installed dependency checks, the correct configuration source and valid PM seed paths. Verify core schema **12** before starting this release. Use the [database migration steps](schema/README.md#3-apply-only-the-required-migrations) when the existing schema is older. OEE module **1** is optional.
 
-## 4. Prepare the existing database
+This command validates local source, dependencies and settings. It does not open the database or prove that the database role/schema is correct. Do not start Uvicorn until this check passes. For missing seed files, use [runtime-data recovery](../docs/runtime-data/README.md); creating an empty `seed/` directory does not install PM documents.
 
-Follow the [database README](schema/README.md): stop every writer, make and verify a native backup/restore drill, inspect actual schema, apply only necessary migrations. Schema 8 needs 8-to-9 then 9-to-10; schema 9 needs only 9-to-10; valid schema 10 needs neither. PostgreSQL version 18.6 is not the PAK schema number.
+## 4. Start in the foreground
 
-Use limited login `pak` for normal execution; keep owner/admin credentials for explicit maintenance. Startup checks schema and privileges without creating, restoring or migrating the database. Existing website passwords remain in the database.
-
-## 5. Run in the foreground first
-
-With the environment active and `PAK_ENV_FILE` exported:
+From the same terminal:
 
 ```sh
-cd "$HOME/Desktop/PAK-rc12/backend"
 python -m uvicorn app.main:app --host 127.0.0.1 --port 5187 --workers 1 --no-proxy-headers
 ```
 
-The ordinary `uvicorn app.main:app ...` command is equivalent when it belongs to this environment; `python -m uvicorn` makes the interpreter explicit. Do not use `--reload`. Stop the intended old API first; do not run two writers during migration.
+The normal `uvicorn app.main:app ...` command is equivalent if it belongs to the active environment. `python -m uvicorn` makes that interpreter explicit. Use one worker and no `--reload` in this manual server setup. Stop the intended old API before using its port.
 
-Expect `Application startup complete`. In another terminal, check the reported HTTP host:
+Expected: `Application startup complete`. Startup now opens PostgreSQL and checks the actual schema and runtime privileges. It still does not migrate, restore or seed anything.
+
+In a second terminal:
 
 ```sh
 curl --fail --show-error -H 'Host: 192.168.12.92' http://127.0.0.1:5187/api/health
 ```
 
-The Host header must match your `PAK_PUBLIC_URL`. Expect version `2.0.0rc12`, `apiVersion: 7`, `schemaVersion: 10`, capability `em-downtime-drilldown`. The default localhost Host may be rejected by request policy. Follow [OEE](oee/README.md) separately if required. Stop foreground Uvicorn with Ctrl+C before starting detached.
+Expect HTTP 200 JSON with `version: 2.0.0rc13`, `apiVersion: 8`, `schemaVersion: 12`, `packageRevision: 2` and capabilities `personnel-activity-drilldown` and `pm-routing-review`. The Host header must match `PAK_PUBLIC_URL`.
 
-## 6. Run detached and read logs
+## 5. Run detached and inspect logs
 
-With the same environment active:
+After foreground startup and health pass, stop that foreground process with Ctrl+C. In the environment above:
 
 ```sh
-export PAK_ENV_FILE="$HOME/Desktop/PAK-data/backend.env"
-cd "$HOME/Desktop/PAK-rc12/backend"
 mkdir -p "$HOME/Desktop/PAK-data/logs"
 nohup python -m uvicorn app.main:app --host 127.0.0.1 --port 5187 --workers 1 --no-proxy-headers > "$HOME/Desktop/PAK-data/logs/uvicorn.log" 2>&1 < /dev/null &
 echo $! > "$HOME/Desktop/PAK-data/logs/uvicorn.pid"
 tail -n 100 -f "$HOME/Desktop/PAK-data/logs/uvicorn.log"
 ```
 
-Ctrl+C stops `tail`, not the detached API. Check startup logs immediately; a background PID alone is not success. This command replaces the previous log, so preserve it first if needed. `nohup` does not provide automatic restart after reboot/crash. PM scheduling/backups remain controlled by the private settings.
+`PAK_ENV_FILE` must still be exported in this terminal. A printed PID alone is not a successful startup. The command replaces the previous log; preserve that log first if needed. Ctrl+C stops `tail`, not the detached backend. `nohup` does not restart the application after a crash or reboot.
 
-To stop the recorded process, first inspect:
+To stop a process started by this procedure, inspect the recorded PID first:
 
 ```sh
 ps -p "$(cat "$HOME/Desktop/PAK-data/logs/uvicorn.pid")" -o pid,args
 ```
 
-Only after confirming this is the intended Uvicorn process:
+Only when it is the intended Uvicorn process:
 
 ```sh
 kill "$(cat "$HOME/Desktop/PAK-data/logs/uvicorn.pid")"
 ```
 
-Wait for shutdown before restart. A stale PID can refer to another process; never kill it without checking. Identify legacy processes separately if they were started outside this procedure.
+Wait for shutdown before restarting. Identify older processes separately; a stale PID can belong to something else.
 
 ## Troubleshooting
 
-| Error | Meaning and action |
+| Message or observation | Correct action |
 | --- | --- |
-| `cannot import name '__version__' from 'pak_maintenance' (unknown location)` | Failure precedes database startup. A missing package `__init__.py` may create a namespace package; wrong/stale source is another possibility. Restore the complete matching backend and check source below. Do not edit the database or create an empty initialization file. |
-| `Incomplete PAK backend` / `loaded from another location` | Source is incomplete or shadowed. Verify a fresh complete extraction, correct working directory, environment and fresh process. |
-| `No module named app` | Start from this release's `backend/`, not the project root or domain source folder. |
-| TLS/loopback error | For `127.0.0.1` with TLS disabled, enable the loopback exception. The LAN exception does not replace it. Check `.env.example`. |
-| Runtime role has administrative privileges | Use limited `pak` in runtime settings; follow database permission checks. Do not grant more authority to hide the error. |
-| Schema mismatch | Inspect the real schema and follow the database README. Never drop/reinitialize the existing database. |
-| Address already in use | Identify and stop the intended old process listening on 5187. Updating files does not stop an old running API. |
-| Browser shows rc10, API unknown | The screen identifies the loaded frontend only. Resolve API startup, check health through Nginx, then publish the matching UI and follow cache instructions. |
+| Missing `__version__` / missing package initialization | Restore a complete matching backend, including `src/pak_maintenance/__init__.py`; do not create an empty file or invent a version string. |
+| `No module named app` | Change directory to the active `backend/`. |
+| `Set PAK_DB_NAME` or another required field | Check the preflight's selected configuration path and overrides. Do not assume `backend.env` was read without `PAK_ENV_FILE`. |
+| A corrected file still results in the wrong database user | Remove the stale exported database settings shown in step 2, then rerun preflight in the same shell. |
+| Runtime account has administrative/replication/bypass authority | Inspect the limited runtime role and ownership using the database guide. A version marker passing does not prove every schema check has passed. |
+| TLS or loopback allowance error | Match the transport profile to the address from the Uvicorn machine. Disabled TLS on `127.0.0.1` requires the explicit loopback allowance; a LAN allowance is separate. |
+| PM metadata or originals missing | Preserve/copy the actual seed files and correct their parent directory; do not stage/import PM again. |
+| Schema mismatch | Inspect the actual contract. Use the [owner-run upgrade steps](schema/README.md#3-apply-only-the-required-migrations) for the inspected schema after a verified backup. |
+| Address already in use | Identify the process listening on 5187 and stop the intended old API. |
+| Browser reports an unknown backend version | Finish foreground startup and direct health first, then check the [Nginx route](../deploy/README.md). |
 
-Safe source diagnostic from `backend/`:
+Safe package diagnostic, without importing settings or connecting to PostgreSQL:
 
 ```sh
-python -c "import app; import pak_maintenance as p; print('source:', p.__file__); print('version:', getattr(p, '__version__', 'MISSING'))"
+python -c "import app; import pak_maintenance as p; print('source:', p.__file__); print('version:', p.__version__)"
 ```
-
-Expect this release's `src/pak_maintenance/__init__.py` and `2.0.0rc12`. It imports neither `app.main` nor database code. Do not invent a version string in mixed source to bypass this error.
-
-## Maintainer map
-
-`application.py` adapts FastAPI; `api.py` defines routes; `database.py` validates storage/permissions. `work_service.py` and `work_review_correction.py` implement reports/approval; `pm_*.py` implement PM forms, PDFs and responsibility; `parts_import.py` handles warehouse imports; `em_downtime.py` provides recorded downtime drilldown. Maintenance tools never run automatically at startup. Tests use generated data. Older portable Windows tools remain source references, not this manual Linux procedure.

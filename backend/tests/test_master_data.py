@@ -24,8 +24,9 @@ class MasterDataTests(unittest.TestCase):
         self.directory = self.fixture_root / uuid.uuid4().hex
         self.directory.mkdir(mode=0o755)
         path = self.directory / "fixture.db"
-        schema = (Path(__file__).resolve().parents[1] / "schema" / "sqlite-v10.sql").read_text(encoding="utf-8")
+        schema = (Path(__file__).resolve().parents[1] / "schema" / "sqlite-v12.sql").read_text(encoding="utf-8")
         schema += "\n" + "\n".join(p.read_text(encoding="utf-8") for p in sorted((Path(__file__).resolve().parents[1] / "schema").glob("sqlite-*-guards.sql")))
+        schema += "\n" + (Path(__file__).resolve().parents[1] / "schema" / "sqlite-pm-routing-v11.sql").read_text(encoding="utf-8")
         raw = sqlite3.connect(path)
         try:
             raw.executescript(schema)

@@ -18,6 +18,7 @@ from .network_policy import validate_file_path
 from .quantity import value as quantity_value
 from .security import ROLES, hash_password, require
 from .permissions import CHIEFS, PERSONNEL_ADMINISTRATORS
+from .work_categories import WORK_TYPES, is_general_asset, physical_asset_sql
 
 
 _EDIT_ROLES = ("admin", "head", "manager", "planner")
@@ -80,6 +81,7 @@ def _asset(row, technician=False):
     if not isinstance(result, dict):
         raise ApiError(409, "اطلاعات شناسنامهٔ تجهیز باید توسط مدیر سامانه بررسی شود.")
     result.update({key: row[key] for key in ("id", "code", "name", "hall", "line")})
+    result['isGeneralWork'] = is_general_asset(row)
     if not technician:
         result["version"] = row["version"]
     return result
@@ -217,6 +219,11 @@ class MasterDataService:
                 columns_to_search = ("code", "name", "specification") if kind == "parts" else ("code", "name", "hall", "line")
                 filters.append("(" + " OR ".join(f"LOWER({column}) LIKE :search ESCAPE '~'" for column in columns_to_search) + ")")
             if kind == "assets":
+                if 'workType' in query:
+                    if query['workType'] not in WORK_TYPES:
+                        raise ApiError(400, 'ماهیت کار برای انتخاب تجهیز معتبر نیست.')
+                    if query['workType'] == 'CM':
+                        filters.append(physical_asset_sql())
                 for field in ("hall", "line"):
                     if field in query:
                         args[field] = text(query[field], maximum=100, field="فیلتر محل", trim=False)

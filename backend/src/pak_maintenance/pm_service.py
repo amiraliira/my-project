@@ -65,6 +65,15 @@ def plan_view(row):
 def issued_template(c,order_id):
     row=c.one("SELECT r.body FROM pm_weekly_occurrences p JOIN pm_template_revisions r ON r.template_id=p.template_id AND r.revision=p.template_version WHERE p.order_id=:id",{"id":order_id})
     return parse(row["body"]) if row else None
+
+def _owns_template(c,user,template_id):
+    """Explicit responsibility grants access without reclassifying the form."""
+    return bool(c.scalar("SELECT COUNT(*) FROM pm_weekly_plans WHERE template_id=:id AND supervisor_id=:viewer",dict(id=template_id,viewer=user.id)) or
+                c.scalar("SELECT COUNT(*) FROM pm_weekly_occurrences p WHERE p.template_id=:id AND "+owner_sql("p")+"=:viewer",dict(id=template_id,viewer=user.id)))
+
+def _execution_owner(c,order_id,original=None):
+    owner=effective_owner(c,order_id,original)
+    return c.one("SELECT id,specialty FROM users WHERE id=:id AND active=1 AND role='supervisor' AND trim(specialty)<>''",dict(id=owner))
 def execution_end(body):
     day=validate_date(body.get("workDate"))
     try:
@@ -83,7 +92,9 @@ def preserve_execution(c,old,input,normalized,user,submitted):
     if normalized.get("type")!="PM" or (normalized.get("assetId") or "")!=(old.get("asset_id") or "") or (normalized.get("assigneeId") or "")!=(old.get("assignee_id") or "") or (normalized.get("dueDate") or "")!=(old.get("due_date") or ""):raise ApiError(403,"دستگاه، موعد و تخصیص برگه هفتگی از برنامه و سرپرست تعیین می‌شود.")
     for key in ("pmWeeklyPlanId","pmSheet","pmWindow","pmSpecialty","pmSupervisorId","pmAssetCodes"):normalized[key]=deepcopy(original.get(key))
     participants=normalized.get("participants",[])
-    if len(participants)>1 or any(p.get("personId")!=old.get("assignee_id") or p.get("specialty")!=occurrence["specialty"] for p in participants):raise ApiError(400,"این برگه فقط یک مجری از همان تخصص دارد.")
+    owner=_execution_owner(c,old["id"],occurrence["supervisor_id"])
+    if participants and (not owner or len(participants)>1 or any(p.get("personId")!=old.get("assignee_id") or p.get("specialty")!=owner["specialty"] for p in participants)):
+        raise ApiError(400,"این برگه فقط یک تکنسین از تیم سرپرست مسئول دارد.")
     if participants and participants[0].get("minutes")!=normalized.get("durationMinutes"):raise ApiError(400,"زمان یک مجری باید برابر ردیف ساعت کار برگه باشد.")
     if normalized.get("checklist"):raise ApiError(400,"نتایج در قالب اصلی برگه ثبت می‌شوند.")
     template=issued_template(c,old["id"])
@@ -120,8 +131,8 @@ class PmService(TemplateLifecycleMixin, PmGovernanceMixin, PmResponsibilityMixin
         # Retired templates remain operational references for planning proposals.
         page,size,offset=bounds(page,size)
         if q is not None and len(q)>300:raise ApiError(400,"جستجو بیش از حد طولانی است.")
-        where=" WHERE mapping_status"+("='retired'" if retired else "<>'retired'")+" AND (CAST(:spec AS TEXT) IS NULL OR specialty=:spec) AND (title LIKE :q ESCAPE '~' OR hall LIKE :q ESCAPE '~' OR period LIKE :q ESCAPE '~')"
-        params=dict(q="%"+(q or "").replace("~","~~").replace("%","~%").replace("_","~_")+"%",spec=user.specialty if user.role=="supervisor" else None,size=size,offset=offset)
+        where=" WHERE mapping_status"+("='retired'" if retired else "<>'retired'")+" AND (CAST(:spec AS TEXT) IS NULL OR specialty=:spec OR EXISTS(SELECT 1 FROM pm_weekly_plans owned WHERE owned.template_id=pm_templates.id AND owned.supervisor_id=:viewer) OR EXISTS(SELECT 1 FROM pm_weekly_occurrences p WHERE p.template_id=pm_templates.id AND "+owner_sql("p")+"=:viewer)) AND (title LIKE :q ESCAPE '~' OR hall LIKE :q ESCAPE '~' OR period LIKE :q ESCAPE '~')"
+        params=dict(q="%"+(q or "").replace("~","~~").replace("%","~%").replace("_","~_")+"%",spec=user.specialty if user.role=="supervisor" else None,viewer=user.id,size=size,offset=offset)
         with self.db.transaction(write=False) as c:
             total=c.scalar("SELECT COUNT(*) FROM pm_templates"+where,params)
             items=[template_view(r,False) for r in c.query("SELECT * FROM pm_templates"+where+" ORDER BY title,id LIMIT :size OFFSET :offset",params)]
@@ -132,14 +143,14 @@ class PmService(TemplateLifecycleMixin, PmGovernanceMixin, PmResponsibilityMixin
         with self.db.connect() as c:
             row=c.one("SELECT * FROM pm_templates WHERE id=:id",dict(id=id))
             if row is None:raise ApiError(404,"قالب پیدا نشد.")
-            if user.role=="supervisor" and row["specialty"]!=user.specialty:raise ApiError(403,"قالب خارج از تخصص شما است.")
+            if user.role=="supervisor" and row["specialty"]!=user.specialty and not _owns_template(c,user,id):raise ApiError(403,"قالب خارج از حوزهٔ مسئولیت شما است.")
             return template_view(row)
 
     def plans(self,user,page=None,size=None,q=None):
         require_library(user);page,size,offset=bounds(page,size)
         if q is not None and len(q)>300:raise ApiError(400,"جستجو بیش از حد طولانی است.")
-        where=" WHERE f.mapping_status<>'retired' AND (CAST(:spec AS TEXT) IS NULL OR p.specialty=:spec) AND (f.title LIKE :q ESCAPE '~' OR p.hall LIKE :q ESCAPE '~')"
-        params=dict(q="%"+(q or "").replace("~","~~").replace("%","~%").replace("_","~_")+"%",spec=user.specialty if user.role=="supervisor" else None,size=size,offset=offset)
+        where=" WHERE f.mapping_status<>'retired' AND (CAST(:spec AS TEXT) IS NULL OR p.specialty=:spec OR p.supervisor_id=:viewer) AND (f.title LIKE :q ESCAPE '~' OR p.hall LIKE :q ESCAPE '~')"
+        params=dict(q="%"+(q or "").replace("~","~~").replace("%","~%").replace("_","~_")+"%",spec=user.specialty if user.role=="supervisor" else None,viewer=user.id,size=size,offset=offset)
         with self.db.transaction(write=False) as c:
             total=c.scalar("SELECT COUNT(*) FROM pm_weekly_plans p JOIN pm_templates f ON f.id=p.template_id"+where,params)
             rows=c.query("SELECT p.* FROM pm_weekly_plans p JOIN pm_templates f ON f.id=p.template_id"+where+" ORDER BY f.title,p.id LIMIT :size OFFSET :offset",params)
@@ -150,7 +161,7 @@ class PmService(TemplateLifecycleMixin, PmGovernanceMixin, PmResponsibilityMixin
         with self.db.transaction(write=False) as c:
             row=c.one("SELECT * FROM pm_weekly_plans WHERE id=:id",dict(id=id))
             if row is None:raise ApiError(404,"برنامه پیدا نشد.")
-            if user.role=="supervisor" and row["specialty"]!=user.specialty:raise ApiError(403,"برنامه خارج از تخصص شما است.")
+            if user.role=="supervisor" and row["specialty"]!=user.specialty and row["supervisor_id"]!=user.id:raise ApiError(403,"برنامه خارج از حوزهٔ مسئولیت شما است.")
             j=plan_view(row);template=parse(c.scalar("SELECT body FROM pm_templates WHERE id=:id",dict(id=row["template_id"])))
             j.update(info.metadata(template));codes=info.member_codes(template)
             members={a["code"]:a for a in info.lookup_assets(c,codes)}
@@ -166,9 +177,9 @@ class PmService(TemplateLifecycleMixin, PmGovernanceMixin, PmResponsibilityMixin
         require_library(user)
         table,revisions,column=("pm_templates","pm_template_revisions","template_id") if template else ("pm_weekly_plans","pm_plan_revisions","plan_id")
         with self.db.connect() as c:
-            row=c.one(f"SELECT specialty FROM {table} WHERE id=:id",dict(id=id))
+            row=c.one(f"SELECT * FROM {table} WHERE id=:id",dict(id=id))
             if row is None:raise ApiError(404,"برگه یا برنامه پیدا نشد.")
-            if user.role=="supervisor" and row["specialty"]!=user.specialty:raise ApiError(403,"سابقه خارج از تخصص شما است.")
+            if user.role=="supervisor" and row["specialty"]!=user.specialty and not (_owns_template(c,user,id) if template else row["supervisor_id"]==user.id):raise ApiError(403,"سابقه خارج از حوزهٔ مسئولیت شما است.")
             rows=c.query(f"SELECT r.revision,r.reason,r.created_at,u.name AS actor_name FROM {revisions} r JOIN users u ON u.id=r.actor_id WHERE r.{column}=:id ORDER BY r.revision DESC LIMIT 20",dict(id=id))
             return dict(items=[dict(version=r["revision"],reason=r["reason"],createdAt=r["created_at"],actorName=r["actor_name"]) for r in rows],limit=20)
 
@@ -214,7 +225,7 @@ class PmService(TemplateLifecycleMixin, PmGovernanceMixin, PmResponsibilityMixin
     def has_due(self,instant=None,actor=None):
         instant=instant or datetime.now(timezone.utc)
         with self.db.connect() as c:
-            return bool(c.scalar("SELECT CASE WHEN EXISTS(SELECT 1 FROM pm_weekly_plans p JOIN pm_templates f ON f.id=p.template_id AND f.mapping_status<>'retired' JOIN users u ON u.id=p.supervisor_id AND u.active=1 AND u.role='supervisor' AND u.specialty=p.specialty WHERE p.active=1 AND p.mapping_confirmed=1 AND p.next_scan<=:today"+(" AND p.supervisor_id=:owner" if actor and actor.role=="supervisor" else "")+") THEN 1 ELSE 0 END",dict(today=cal.tehran_date(instant).isoformat(),owner=actor.id if actor else None)))
+            return bool(c.scalar("SELECT CASE WHEN EXISTS(SELECT 1 FROM pm_weekly_plans p JOIN pm_templates f ON f.id=p.template_id AND f.mapping_status<>'retired' JOIN users u ON u.id=p.supervisor_id AND u.active=1 AND u.role='supervisor' AND trim(u.specialty)<>'' WHERE p.active=1 AND p.mapping_confirmed=1 AND p.next_scan<=:today"+(" AND p.supervisor_id=:owner" if actor and actor.role=="supervisor" else "")+") THEN 1 ELSE 0 END",dict(today=cal.tehran_date(instant).isoformat(),owner=actor.id if actor else None)))
 
     def generate(self,instant=None,actor=None):
         if actor and (not actor.active or actor.role not in ("head","manager","admin","planner","supervisor")):raise ApiError(403,"صدور برنامه برای این حساب مجاز نیست.")
@@ -224,7 +235,7 @@ class PmService(TemplateLifecycleMixin, PmGovernanceMixin, PmResponsibilityMixin
                 from .security import assert_live_actor
                 assert_live_actor(c,actor)
             count=0
-            plans=c.query("SELECT p.* FROM pm_weekly_plans p JOIN pm_templates f ON f.id=p.template_id AND f.mapping_status<>'retired' JOIN users u ON u.id=p.supervisor_id AND u.active=1 AND u.role='supervisor' AND u.specialty=p.specialty WHERE p.active=1 AND p.mapping_confirmed=1 AND p.next_scan<=:today"+(" AND p.supervisor_id=:owner" if actor and actor.role=="supervisor" else "")+" ORDER BY p.next_scan,p.id LIMIT 25"+("" if c.is_sqlite else " FOR UPDATE OF p"),dict(today=iso,owner=actor.id if actor else None))
+            plans=c.query("SELECT p.* FROM pm_weekly_plans p JOIN pm_templates f ON f.id=p.template_id AND f.mapping_status<>'retired' JOIN users u ON u.id=p.supervisor_id AND u.active=1 AND u.role='supervisor' AND trim(u.specialty)<>'' WHERE p.active=1 AND p.mapping_confirmed=1 AND p.next_scan<=:today"+(" AND p.supervisor_id=:owner" if actor and actor.role=="supervisor" else "")+" ORDER BY p.next_scan,p.id LIMIT 25"+("" if c.is_sqlite else " FOR UPDATE OF p"),dict(today=iso,owner=actor.id if actor else None))
             for row in plans:
                 p=parse(row["body"]);cursor=row["cursor_month"];current=cal.month_key(today);next_scan=iso;activation=date.fromisoformat(row["start_date"]);effective=cal.parse_utc(p["effectiveFromUtc"])
                 for _ in range(24):
@@ -267,7 +278,7 @@ class PmService(TemplateLifecycleMixin, PmGovernanceMixin, PmResponsibilityMixin
             if occurrence is None:raise ApiError(404,"برگه هفتگی پیدا نشد.")
             if user.role!="supervisor" or user.id!=effective_owner(c,id,occurrence["supervisor_id"]):raise ApiError(403,"تخصیص این برگه با سرپرست مسئول آن است.")
             if row["status"]!="draft" or c.scalar("SELECT COUNT(*) FROM participants WHERE order_id=:id",dict(id=id)):raise ApiError(409,"پس از ثبت کار یا ارسال گزارش، تخصیص قابل تغییر نیست.")
-            if not c.scalar("SELECT COUNT(*) FROM users WHERE id=:person AND active=1 AND role='technician' AND specialty=:spec",dict(person=person,spec=occurrence["specialty"])):raise ApiError(400,"یک تکنسین فعال همان تخصص انتخاب کنید.")
+            if not user.specialty or not c.scalar("SELECT COUNT(*) FROM users WHERE id=:person AND active=1 AND role='technician' AND specialty=:spec",dict(person=person,spec=user.specialty)):raise ApiError(400,"یک تکنسین فعال از تیم سرپرست مسئول انتخاب کنید.")
             j=parse(row["body"])
             if any(str(value).strip() for value in j.get("pmResults",{}).values()):raise ApiError(409,"پس از ثبت نتیجه، تغییر مجری به بازبینی جداگانه نیاز دارد.")
             j["assigneeId"]=person
@@ -418,7 +429,7 @@ class PmService(TemplateLifecycleMixin, PmGovernanceMixin, PmResponsibilityMixin
                 if active and (not declared or asset not in ids):raise ApiError(400,"تجهیز مرجع باید عضو فهرست واقعی همین برگه گروهی باشد.")
             elif asset:ids.append(asset);codes.append(c.scalar("SELECT code FROM assets WHERE id=:id",dict(id=asset)))
             if active and not asset:raise ApiError(400,"تجهیز معتبر انتخاب کنید.")
-            if owner and not c.scalar("SELECT COUNT(*) FROM users WHERE id=:id AND active=1 AND role='supervisor' AND specialty=:spec",dict(id=owner,spec=row["specialty"])):raise ApiError(400,"سرپرست فعال همان تخصص انتخاب کنید.")
+            if owner and not c.scalar("SELECT COUNT(*) FROM users WHERE id=:id AND active=1 AND role='supervisor' AND trim(specialty)<>''",dict(id=owner)):raise ApiError(400,"یک سرپرست فعال با تیم مشخص انتخاب کنید.")
             recurrence=schedule.normalize(input.get("recurrence",j.get("recurrence")),template);source=recurrence["mode"]=="source-period"
             if active and schedule.non_calendar_blockers(template):raise ApiError(409,"برگه فعالیت اجرایی یا اعضای معتبر ندارد؛ فعال‌سازی ممکن نیست.")
             if active and source and recurrence["meterPolicy"]!="calendar-only":raise ApiError(409,"موتور ساعت دستگاه هنوز فعال نیست؛ مبنای تقویمی باید صریح توسط رئیس انتخاب شود.")

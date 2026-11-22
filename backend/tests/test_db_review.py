@@ -10,6 +10,7 @@ from unittest.mock import patch
 from contextlib import contextmanager
 import hashlib
 import os
+import re
 import shutil
 import sqlite3
 import unittest
@@ -29,8 +30,9 @@ class EvidenceGuardsTests(unittest.TestCase):
         self.root = PROJECT / "tests" / ".db-review-fixtures"
         self.path = self.root / uuid4().hex / "synthetic.db"
         self.path.parent.mkdir(parents=True, mode=0o755)
-        self.schema = (PROJECT / "schema" / "sqlite-v10.sql").read_text(encoding="utf-8")
+        self.schema = (PROJECT / "schema" / "sqlite-v12.sql").read_text(encoding="utf-8")
         self.guards = "\n".join(p.read_text(encoding="utf-8") for p in sorted((PROJECT / "schema").glob("sqlite-*-guards.sql")))
+        self.guards += "\n" + (PROJECT / "schema" / "sqlite-pm-routing-v11.sql").read_text(encoding="utf-8")
         raw = sqlite3.connect(self.path)
         raw.executescript(self.schema + "\n" + self.guards)
         raw.close()
@@ -207,6 +209,7 @@ class NativeClientBoundaryReviewTests(unittest.TestCase):
 class PostgreSQLRolePolicyTests(unittest.TestCase):
     """Metadata fault injection, not execution of SQL on PostgreSQL."""
     class Metadata:
+        is_sqlite = False
         def __init__(self, *, administrative=False, schema_create=False, owner=False):
             self.role=dict(rolsuper=administrative,rolcreatedb=False,rolcreaterole=False,rolreplication=False,rolbypassrls=False)
             self.schema_create=schema_create;self.owner=owner;self.guards=set(_POSTGRESQL_GUARDS)
@@ -216,18 +219,28 @@ class PostgreSQLRolePolicyTests(unittest.TestCase):
             self.privileges=[dict(table_name=name,can_select=True,can_insert=True,can_update=True,can_delete=True,can_truncate=False,can_trigger=False) for name in _REQUIRED_COLUMNS]
         def query(self,sql,params=None):
             self.calls.append(sql)
-            if sql=="SELECT version FROM schema_version":return [{"version":10}]
+            if sql=="SELECT version FROM schema_version":return [{"version":12}]
             if "information_schema.columns" in sql:
                 if "table_name=:table" in sql:return [{"column_name":name} for name in _REQUIRED_COLUMNS[params["table"]]]
                 return [{"table_name":name,"data_type":self.unit_type} for name in ("order_parts","stock_movements","part_consumptions","part_consumption_totals")]
             if "FROM pg_trigger" in sql:return [{"name":name} for name in self.guards]
+            if "FROM pg_constraint" in sql and "pg_get_constraintdef(oid) AS definition" in sql:
+                return [dict(name="ck_orders_work_type", validated=True,
+                             definition="CHECK ((type = ANY (ARRAY['PM'::text, 'EM'::text, 'CM'::text, 'PROJECT'::text, 'GENERAL'::text])))")]
             if "FROM pg_constraint" in sql:return [{"name":name} for name in self.constraints]
+            if "p.prosrc AS body" in sql:
+                source=(PROJECT/'schema/postgresql-pm-routing-v11.sql').read_text(encoding='utf-8')
+                return [dict(name=name,body=body) for name,body in re.findall(r'CREATE OR REPLACE FUNCTION (\w+)\(\).*?AS \$\$(.*?)\$\$;',source,re.S)]
             if "FROM pg_proc" in sql:return [{"name":name} for name in self.functions]
             if "has_table_privilege" in sql:return self.privileges
             raise AssertionError("Unexpected metadata query: "+sql)
         def one(self,sql,params=None):
             self.calls.append(sql)
             if "FROM pg_roles" in sql:return self.role
+            if "FROM pg_index" in sql:
+                from pak_maintenance.pm_routing_contract import ROUTING_INDEXES
+                table,columns=ROUTING_INDEXES[params['name']]
+                return dict(table_name=table,columns=list(columns),indisvalid=True,indisready=True,not_partial=True)
             raise AssertionError("Unexpected metadata single query: "+sql)
         def scalar(self,sql,params=None):
             self.calls.append(sql)

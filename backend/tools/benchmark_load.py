@@ -50,6 +50,7 @@ PASSWORD = 'Synthetic-Load-Only-2026!'
 
 
 def save(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 
@@ -217,7 +218,7 @@ def measure():
                 quantityUnits=int(consumption['units']),scoreCents=int(cents),invalidConstraints=invalid,
                 elapsedSeconds=round(time.perf_counter()-started,3),allGuardsEnabled=True,
                 limits='Actual HTTPS and guarded PostgreSQL writes; same synthetic actors deliberately stress shared approvals. No company server or data involved.')
-            save(ROOT/'docs/rc6-concurrent-writes.json',report)
+            save(ROOT/'.build/reports/rc6-concurrent-writes.json',report)
             print(json.dumps(report),flush=True)
             return
         routes=(('dashboard','head','/api/dashboard'),('performance','head','/api/performance?period=all&detailPageSize=25'),
@@ -286,7 +287,7 @@ def measure():
             hostRestriction='Sandbox native background/parallel process signaling is restricted; isolated QA roles use serial query plans. This is not a production database setting.',
             requestsPerClient=args.requests_per_client,rounds=rounds,connectionAndOneQueryMedianMilliseconds=round(statistics.median(timings),3),
             companyNetworkCapacityTested=False,limits='Local synthetic mixed reads over actual HTTPS and PostgreSQL; fixed role mix, not the company server/LAN or a production capacity guarantee.')
-        save(ROOT/'docs'/('rc6-load-'+args.variant+'.json'),report)
+        save(ROOT/'.build/reports'/('rc6-load-'+args.variant+'.json'),report)
     finally:
         server.should_exit=True;thread.join(15);listener.close()
         if thread.is_alive():raise RuntimeError('Owned load listener did not finish')

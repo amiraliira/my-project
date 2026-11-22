@@ -17,6 +17,7 @@ const hooks=await import(hooksUrl);
 const apiUrl=encode(`let calls=[],failure='';export const reset=value=>{calls=[];failure=value||'';},requests=()=>calls;export async function post(path,body){calls.push({path,body});if(failure)throw Error(failure);return {version:8};}export const api=()=>{},put=()=>{};`);
 const api=await import(apiUrl);
 const uiUrl=encode(`import{createElement as h}from ${JSON.stringify(resolve('react'))};let order=null;export const setOrder=value=>{order=value;};
+export const reportEquipment=order=>order.assetName||'';
 export const Field=({label,children})=>h('label',null,label,children),ErrorBox=({text})=>text?h('div',{role:'alert'},text):null,Modal=({title,children})=>h('div',{role:'dialog','aria-label':title},children),Icon=()=>null;
 export const duration=(a,b)=>{if(!a||!b)return 0;const x=a.split(':').map(Number),y=b.split(':').map(Number);return(y[0]*60+y[1]-x[0]*60-x[1]+1440)%1440;},num=value=>String(value??0),errorText=error=>error.message;
 export const useResource=()=>({data:order,loading:false,error:'',reload:()=>{}}),useDebounce=value=>value,dateFa=value=>value||'',statuses={},workTypes={},stringify=value=>JSON.stringify(value),todayIso=()=> '2026-11-03',requestId=()=> 'test-key';
@@ -25,7 +26,7 @@ export const Badge=()=>null,DataTable=()=>null,Empty=()=>null,Loading=()=>null,P
 const catalogUrl=encode('export const CatalogSelect=()=>null,PageControls=()=>null;');
 const time24Url=encode(`import{createElement as h}from ${JSON.stringify(resolve('react'))};export default function Time24({value,onChange,label,disabled,required}){return h('input',{type:'text',value,'aria-label':label,disabled,required,onChange:event=>onChange(event.target.value)});}`);
 const quantityUrl=encode(compile('quantities.ts'));
-const scoringUrl=encode(compile('scoring.ts'));
+const scoringUrl=encode(compile('scoring.ts',{'./clock24':encode(compile('clock24.ts'))}));
 const gradingUrl=encode(compile('Grading.tsx',{'react/jsx-runtime':resolve('react/jsx-runtime'),'./ui':uiUrl,'./scoring':scoringUrl,'./permissions':encode(compile('permissions.ts'))}));
 const imports={'react':hooksUrl,'react/jsx-runtime':resolve('react/jsx-runtime'),'./api':apiUrl,'./Catalog':catalogUrl,'./Time24':time24Url,'./quantities':quantityUrl,'./ui':uiUrl,'./scoring':scoringUrl,'./Grading':gradingUrl};
 const moduleUrl=encode(compile('ReviewCorrection.tsx',imports));
@@ -91,7 +92,7 @@ test('part deletion and adding a catalog part invalidate preview and affect the 
 });
 
 const ui=await import(uiUrl);
-const ordersUrl=encode(compile('Orders.tsx',{'react':resolve('react'),'react/jsx-runtime':resolve('react/jsx-runtime'),'./api':apiUrl,'./Catalog':catalogUrl,'./Time24':time24Url,'./ui':uiUrl,'./quantities':quantityUrl,'./ReviewCorrection':moduleUrl,'./PmWork':encode('export const PmExecution=()=>null,PmOrderSheet=()=>null;'),'./Workflow':encode('export const WorkflowProgress=()=>null;'),'./Grading':encode('export const HeadGradeInputs=()=>null,ParticipantGrades=()=>null,SupervisorGradeInputs=()=>null;'),'./scoring':encode('export const participantGradePayload=()=>null;'),'./permissions':encode('export const mayViewGrades=()=>false;')}));
+const ordersUrl=encode(compile('Orders.tsx',{'react':resolve('react'),'react/jsx-runtime':resolve('react/jsx-runtime'),'./api':apiUrl,'./Catalog':catalogUrl,'./Time24':time24Url,'./ui':uiUrl,'./quantities':quantityUrl,'./ReviewCorrection':moduleUrl,'./PmWork':encode('export const PmExecution=()=>null,PmOrderSheet=()=>null;'),'./Workflow':encode('export const WorkflowProgress=()=>null;'),'./Grading':encode('export const HeadGradeInputs=()=>null,ParticipantGrades=()=>null,SupervisorGradeInputs=()=>null;'),'./scoring':scoringUrl,'./permissions':encode('export const mayViewGrades=()=>false;')}));
 const {OrderDetail,initialReportParticipants,recordedStopText}=await import(ordersUrl);
 
 test('new supervisor and technician reports begin with their own participation, while assignments and existing rosters stay distinct',()=>{
@@ -141,17 +142,37 @@ const reportHooksUrl=encode(`let values=[],i=0;export const reset=()=>{values=[]
 const reportHooks=await import(reportHooksUrl);
 const reportApiUrl=encode(`let mode,draft,sent,calls=[];export const configure=(next,initial,submitted)=>{mode=next;draft=initial;sent=submitted;calls=[];},requests=()=>calls;export async function put(path,body){calls.push({method:'PUT',path,body});return{...draft,version:draft.version+1};}export async function post(path,body){calls.push({method:'POST',path,body});if(path.endsWith('/submit')){if(mode==='success')return sent;throw Error('خطای ارسال');}return draft;}export async function api(path){calls.push({method:'GET',path});if(mode==='recovered')return sent;throw Error('خطای دریافت');}`);
 const reportApi=await import(reportApiUrl);
-const reportEditorModule=await import(encode(compile('Orders.tsx',{'react':reportHooksUrl,'react/jsx-runtime':resolve('react/jsx-runtime'),'./api':reportApiUrl,'./Catalog':catalogUrl,'./Time24':time24Url,'./ui':uiUrl,'./quantities':quantityUrl,'./ReviewCorrection':moduleUrl,'./PmWork':encode('export const PmExecution=()=>null,PmOrderSheet=()=>null;'),'./Workflow':encode('export const WorkflowProgress=()=>null;'),'./Grading':encode('export const HeadGradeInputs=()=>null,ParticipantGrades=()=>null,SupervisorGradeInputs=()=>null;'),'./scoring':encode('export const participantGradePayload=()=>null;'),'./permissions':encode('export const mayViewGrades=()=>false;')})));
+const reportEditorModule=await import(encode(compile('Orders.tsx',{'react':reportHooksUrl,'react/jsx-runtime':resolve('react/jsx-runtime'),'./api':reportApiUrl,'./Catalog':catalogUrl,'./Time24':time24Url,'./ui':uiUrl,'./quantities':quantityUrl,'./ReviewCorrection':moduleUrl,'./PmWork':encode('export const PmExecution=()=>null,PmOrderSheet=()=>null;'),'./Workflow':encode('export const WorkflowProgress=()=>null;'),'./Grading':encode('export const HeadGradeInputs=()=>null,ParticipantGrades=()=>null,SupervisorGradeInputs=()=>null;'),'./scoring':scoringUrl,'./permissions':encode('export const mayViewGrades=()=>false;')})));
 function reportEditor(mode='success',assignmentMode=false,existing=true){
  reportHooks.reset();const actions=[],received=[];
  const draft={...order,type:assignmentMode?'PM':'EM',status:'draft',createdBy:user.id,assetId:'asset',description:'تعمیر و آزمون عملکرد پمپ',assigneeId:assignmentMode?'m1':null};
  const sent={...draft,status:'supervisor',version:9,canDecide:true,decisionSpecialty:'مکانیک'};reportApi.configure(mode,draft,sent);
- const props={existing:existing?draft:undefined,assignmentMode,context:{user,boot:{people:[],assets:[],parts:[]},notify:()=>{},refresh:async()=>{}},saved:()=>actions.push('saved'),close:()=>actions.push('close'),onSubmitted:value=>{actions.push('submitted');received.push(value);}};
+ const props={existing:existing?draft:undefined,assignmentMode,context:{user,boot:{people:[],assets:[],parts:[],locations:['سالن آزمون']},notify:()=>{},refresh:async()=>{}},saved:()=>actions.push('saved'),close:()=>actions.push('close'),onSubmitted:value=>{actions.push('submitted');received.push(value);}};
  const render=()=>{reportHooks.begin();const child=reportEditorModule.OrderEditor(props);return child.type(child.props);};
  const find=(type,predicate=()=>true)=>nodes(render()).find(node=>node.type===type&&predicate(node));
  return{actions,received,sent,find,render};
 }
 const reportEvent=()=>({preventDefault(){},currentTarget:{form:{reportValidity:()=>true}}});
+
+test('general work records the hall without equipment, while CM requests the equipment filter', async () => {
+ const view = reportEditor('success', false, false);
+ const category = () => view.find('select', node => ['EM', 'GENERAL', 'CM'].includes(node.props.value));
+ category().props.onChange({ target: { value: 'GENERAL' } });
+ const hall = view.find('select', node => node.props.required === true);
+ hall.props.onChange({ target: { value: 'سالن آزمون' } });
+ assert.equal(view.find('input', node => node.props.placeholder?.includes('تعویض')).props.required, true);
+ view.find('input', node => node.props.placeholder?.includes('تعویض')).props.onChange({ target: { value: 'مرتب کردن ابزار' } });
+ assert.equal(nodes(view.render()).some(node => node.props.kind === 'assets'), false);
+ await view.find('form').props.onSubmit(reportEvent());
+ assert.equal(reportApi.requests()[0].body.type, 'GENERAL');
+ assert.equal(reportApi.requests()[0].body.hall, 'سالن آزمون');
+ assert.equal('assetId' in reportApi.requests()[0].body, false);
+
+ const corrective = reportEditor('success', false, false);
+ corrective.find('select', node => node.props.value === 'EM').props.onChange({ target: { value: 'CM' } });
+ const asset = nodes(corrective.render()).find(node => node.props.kind === 'assets');
+ assert.deepEqual(asset.props.filters, { workType: 'CM' });
+});
 
 test('a new supervisor own-work report opens directly for execution without assignment fields; existing assignments remain editable',()=>{
  const view=reportEditor('success',false,false),own=renderToStaticMarkup(view.render());

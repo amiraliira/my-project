@@ -45,9 +45,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CONFIG_ENV = "PAK_POSTGRES_TEST_CONFIG"
 INSTANT = datetime(2026, 10, 11, 8, tzinfo=timezone.utc)
 INITIALIZATION = (
-    "postgresql-v10.sql", "postgresql-score-functions.sql",
+    "postgresql-v12.sql", "postgresql-score-functions.sql",
     "postgresql-ledger-guards.sql", "postgresql-pm-guards.sql",
-    "postgresql-evidence-guards.sql", "postgresql-archive-guards.sql",
+    "postgresql-evidence-guards.sql", "postgresql-archive-guards.sql", "postgresql-pm-routing-v11.sql",
 )
 # Public, unrelated synthetic CA fixture; its private key was discarded.
 # Keeping this test-only trust root avoids adding a certificate-generation
@@ -146,7 +146,7 @@ class PostgreSQLAcceptance(unittest.TestCase):
             raise RuntimeError("QA fixture was not initialized by this test class.")
         with self.owner.transaction() as c:
             c.execute("TRUNCATE TABLE " + ",".join(spec.name for spec in TABLES) + ",participant_grading_policies,pm_responsibility_transfers")
-            c.execute("INSERT INTO schema_version(version) VALUES(10)")
+            c.execute("INSERT INTO schema_version(version) VALUES(12)")
 
     def setUp(self):
         self.clear_fixture()

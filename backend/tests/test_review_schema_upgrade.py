@@ -57,7 +57,8 @@ class ReviewSchemaUpgradePostgresqlTests(unittest.TestCase):
         self.assertFalse(result['alreadyApplied'])
         self.assertFalse(result['historicalArchivesRewritten'])
         self.assertEqual(self.snapshot(), before)
-        self.runtime.verify_schema()
+        with self.runtime.transaction(write=False) as c:
+            self.runtime._verify_schema_connection(c, runtime_role=True, expected_version=10)
         assert_database_constraints(self, self.owner)
         self.assertTrue(upgrade_postgresql_v9(self.owner, runtime_user=self.config.user)['alreadyApplied'])
         self.direct_sql()
@@ -86,7 +87,8 @@ class ReviewSchemaUpgradePostgresqlTests(unittest.TestCase):
         last = upgrade_postgresql_v9(self.owner, runtime_user=self.config.user)
         self.assertEqual(last['schemaVersion'], 10)
         self.assertEqual(self.snapshot(), middle)
-        self.runtime.verify_schema()
+        with self.runtime.transaction(write=False) as c:
+            self.runtime._verify_schema_connection(c, runtime_role=True, expected_version=10)
         assert_database_constraints(self, self.owner)
 
     def test_failure_after_new_ddl_rolls_back_guards_constraint_marker_and_all_rows(self):

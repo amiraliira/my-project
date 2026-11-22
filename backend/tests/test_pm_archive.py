@@ -207,7 +207,8 @@ class PmArchiveTests(unittest.TestCase):
             plan=c.query('EXPLAIN (FORMAT JSON) '+self.services.archive._select()+ ' ORDER BY a.submitted_at DESC,a.id DESC LIMIT 25')
             self.assertEqual(c.scalar("SELECT COUNT(*) FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid WHERE c.relname LIKE 'ix_pm_archive_%' AND i.indisvalid"),6)
         report=dict(timestampUtc=datetime.now(timezone.utc).isoformat(),provider='PostgreSQL '+self.db.server_version,databaseVersionNum=self.db.server_version_num,syntheticOnly=True,submissions=10001,pageSize=25,medianMilliseconds=samples,pythonPeakBytes=peaks,responseBytes={'archive':archive_bytes,'workOrderList':old_bytes},explain=plan,companyNetworkCapacityTested=False)
-        target=__import__('pathlib').Path(__file__).resolve().parents[1]/'docs/rc5-archive-performance.json'
+        target=__import__('pathlib').Path(__file__).resolve().parents[1]/'.build/reports/rc5-archive-performance.json'
+        target.parent.mkdir(parents=True,exist_ok=True)
         target.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
     def test_native_backup_restore_preserves_filled_archive_and_immutable_guards(self):

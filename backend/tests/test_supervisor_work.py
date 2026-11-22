@@ -10,8 +10,9 @@ from pak_maintenance.reporting_service import ReportingService
 import test_workflow as workflow
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = (ROOT / 'schema/sqlite-v10.sql').read_text(encoding='utf-8')
+BASE = (ROOT / 'schema/sqlite-v12.sql').read_text(encoding='utf-8')
 GUARDS = '\n'.join(p.read_text(encoding='utf-8') for p in sorted((ROOT / 'schema').glob('sqlite-*-guards.sql')))
+GUARDS += '\n' + (ROOT / 'schema/sqlite-pm-routing-v11.sql').read_text(encoding='utf-8')
 
 
 class SupervisorWorkTests(unittest.TestCase):

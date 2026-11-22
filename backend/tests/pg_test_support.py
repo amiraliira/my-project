@@ -17,8 +17,9 @@ from pak_maintenance.migration import verify_schema8_snapshot_target
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPTS = ("postgresql-v10.sql", "postgresql-score-functions.sql", "postgresql-ledger-guards.sql",
-           "postgresql-pm-guards.sql", "postgresql-evidence-guards.sql", "postgresql-archive-guards.sql")
+LEGACY_SCRIPTS = ("postgresql-v10.sql", "postgresql-score-functions.sql", "postgresql-ledger-guards.sql",
+                 "postgresql-pm-guards.sql", "postgresql-evidence-guards.sql", "postgresql-archive-guards.sql")
+SCRIPTS = ("postgresql-v12.sql", *LEGACY_SCRIPTS[1:], "postgresql-pm-routing-v11.sql")
 
 
 def initialize_schema8(owner, runtime_user, *, optional_oee=False):
@@ -27,7 +28,7 @@ def initialize_schema8(owner, runtime_user, *, optional_oee=False):
         raise ValueError("Invalid synthetic runtime role")
     directory = ROOT / "tests" / "fixtures" / "schema8"
     with owner.transaction() as c:
-        for script in ("postgresql-v8.sql", *SCRIPTS[1:]):
+        for script in ("postgresql-v8.sql", *LEGACY_SCRIPTS[1:]):
             c.raw.execute((directory / script).read_text(encoding="utf-8-sig"))
         if optional_oee:
             c.raw.execute((directory / "postgresql-oee-v1.sql").read_text(encoding="utf-8-sig"))
@@ -45,7 +46,7 @@ def initialize_schema9(owner, runtime_user, *, optional_oee=False):
         raise ValueError("Invalid synthetic runtime role")
     directory = ROOT / "tests" / "fixtures" / "schema9"
     with owner.transaction() as c:
-        for script in ("postgresql-v9.sql", *SCRIPTS[1:]):
+        for script in ("postgresql-v9.sql", *LEGACY_SCRIPTS[1:]):
             c.raw.execute((directory / script).read_text(encoding="utf-8-sig"))
         if optional_oee:
             c.raw.execute((directory / "postgresql-oee-v1.sql").read_text(encoding="utf-8-sig"))

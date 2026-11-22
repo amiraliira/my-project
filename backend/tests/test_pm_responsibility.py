@@ -70,7 +70,7 @@ class PmResponsibilityTests(unittest.TestCase):
         for actor in ("admin", "sm", "m1"):
             self.assert_error(403, lambda actor=actor: self.transfer(actor))
             self.assert_error(403, lambda actor=actor: self.pm.responsibility(self.users[actor], self.id))
-        for target in ("se", "m1", "missing"):
+        for target in ("m1", "missing"):
             self.assert_error(400, lambda target=target: self.transfer(supervisorId=target))
         self.assert_error(400, lambda: self.transfer(reason=" "))
         self.assert_error(400, lambda: self.transfer(version=True))
@@ -170,7 +170,7 @@ class PmResponsibilityTests(unittest.TestCase):
     def test_database_rejects_unauthorized_actor_target_owner_and_version(self):
         sql = ("INSERT INTO pm_responsibility_transfers(id,order_id,order_version,from_supervisor_id,"
                "to_supervisor_id,actor_id,reason,created_at) VALUES('forged',:id,:version,:previous,:target,:actor,'علت آزمایشی','2026-11-02')")
-        for changes in (dict(actor='admin'), dict(actor='sm'), dict(target='se'), dict(target='m1'),
+        for changes in (dict(actor='admin'), dict(actor='sm'), dict(target='missing'), dict(target='m1'),
                         dict(previous='sm2'), dict(version=2)):
             with self.subTest(changes=changes), self.assertRaises(sqlite3.IntegrityError):
                 with self.db.transaction() as c:
@@ -266,7 +266,7 @@ class PmResponsibilityPostgresqlTests(unittest.TestCase):
     def test_native_routing_guards_reject_forged_transfer_and_history_rewrites(self):
         sql = ("INSERT INTO pm_responsibility_transfers(id,order_id,order_version,from_supervisor_id,"
                "to_supervisor_id,actor_id,reason,created_at) VALUES('forged',:id,:version,:previous,:target,:actor,'علت آزمایشی','2026-11-02')")
-        for changes in (dict(actor='admin'), dict(actor='sm'), dict(target='se'), dict(target='tech'),
+        for changes in (dict(actor='admin'), dict(actor='sm'), dict(target='missing'), dict(target='tech'),
                         dict(previous='sm2'), dict(version=2)):
             with self.subTest(changes=changes), self.assertRaises(Exception) as rejected:
                 with self.db.transaction() as c:

@@ -488,7 +488,7 @@ class WorkflowCase(unittest.TestCase):
 
 class FullSchemaWorkflowTests(unittest.TestCase):
     schema_directory = Path(__file__).resolve().parent.parent / "schema"
-    schema = (schema_directory / "sqlite-v10.sql").read_text(encoding="utf-8") + "\n" + "\n".join(p.read_text(encoding="utf-8") for p in sorted(schema_directory.glob("sqlite-*-guards.sql")))
+    schema = (schema_directory / "sqlite-v12.sql").read_text(encoding="utf-8") + "\n" + "\n".join(p.read_text(encoding="utf-8") for p in sorted(schema_directory.glob("sqlite-*-guards.sql"))) + "\n" + (schema_directory / "sqlite-pm-routing-v11.sql").read_text(encoding="utf-8")
     setUp = WorkflowCase.setUp
     tearDown = WorkflowCase.tearDown
     body = WorkflowCase.body

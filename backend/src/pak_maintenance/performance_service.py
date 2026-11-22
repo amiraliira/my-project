@@ -1,12 +1,16 @@
 """Role-scoped personnel performance from immutable final scoring facts."""
 from datetime import date
 from decimal import Decimal, ROUND_HALF_EVEN
-from .common import ApiError, today
+from .common import ApiError, text, today
+from .permissions import can_view_personnel_reports
+from .quantity import value as quantity_value
 from .reporting_service import FACT_JOINS, score_aggregate, parse_score
 from .score_facts import round_score, stored_decimal
 
 MONTH_NAMES = ("فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند")
 BASIC_JOINS = "FROM orders o JOIN participants p ON p.order_id=o.id JOIN users u ON u.id=p.person_id"
+HALL_JOINS = "FROM participants p JOIN orders o ON o.id=p.order_id JOIN assets a ON a.id=o.asset_id"
+HALL_TOTALS = "COUNT(*) AS activity_count,COALESCE(SUM(CAST(p.minutes AS BIGINT)),0) AS minutes"
 
 
 def hours(minutes):
@@ -59,10 +63,81 @@ class PerformanceService:
     def __init__(self, db):
         self.db = db
 
+    def hall_report(self, viewer, *, kind=None, year=None, month=None, person_id=None,
+                    page=None, page_size=None, hall=None, activities=False):
+        """Page one person's final work, grouped by the equipment's recorded hall."""
+        from .work_service import WorkService
+        WorkService._role(viewer)
+        person = viewer.id if person_id is None else text(person_id, maximum=100, field="شناسه فرد")
+        if not person:
+            raise ApiError(400, "فرد موردنظر را انتخاب کنید.")
+        if person != viewer.id and not can_view_personnel_reports(viewer):
+            raise ApiError(403, "گزارش عملکرد سایر نفرات فقط در دسترس رئیس است.")
+        selected = period(kind, year, month)
+        page, size = WorkService.page_bounds(page, 12 if page_size is None else page_size, maximum=25)
+        args = {"person": person, "size": size, "offset": (page - 1) * size}
+        where = " WHERE p.person_id=:person AND o.status='completed'"
+        if selected["kind"] == "monthly":
+            where += " AND o.work_date>=:start AND o.work_date<:end"
+            args.update(start=selected["startDate"], end=selected["endDate"])
+        if activities:
+            args["hall"] = text(hall, maximum=100, field="سالن", trim=False)
+            where += " AND a.hall=:hall"
+        with self.db.transaction(write=False) as c:
+            from .security import assert_live_actor
+            assert_live_actor(c, viewer, lock=False)
+            person_row = c.one("SELECT name,specialty FROM users WHERE id=:person", args)
+            if person_row is None:
+                raise ApiError(404, "فرد موردنظر یافت نشد.")
+            totals = c.one("SELECT " + HALL_TOTALS + " " + HALL_JOINS + where, args)
+            response = {"personId": person, "personName": person_row["name"], "period": selected,
+                        "activityCount": int(totals["activity_count"]), "minutes": int(totals["minutes"]),
+                        "page": page, "pageSize": size}
+            if activities:
+                rows = c.query("SELECT o.id,o.work_date,o.type,o.title,o.description,a.name AS asset_name,"
+                               "a.line,p.minutes " + HALL_JOINS + where +
+                               " ORDER BY o.work_date DESC,o.id DESC LIMIT :size OFFSET :offset", args)
+                items = self._hall_activity_details(c, rows)
+                return {**response, "hall": args["hall"], "items": items, "total": response["activityCount"]}
+            total = c.scalar("SELECT COUNT(DISTINCT a.hall) " + HALL_JOINS + where, args)
+            rows = c.query("SELECT a.hall," + HALL_TOTALS + " " + HALL_JOINS + where +
+                           " GROUP BY a.hall ORDER BY minutes DESC,a.hall LIMIT :size OFFSET :offset", args)
+        return {**response, "total": int(total), "items": [
+            {"hall": row["hall"], "activityCount": int(row["activity_count"]), "minutes": int(row["minutes"])}
+            for row in rows
+        ]}
+
+    @staticmethod
+    def _hall_activity_details(connection, rows):
+        # Fetch just the displayed affiliations and consumed parts as two
+        # bounded reads. Personnel scoring tables aren't part of this view.
+        if not rows:
+            return []
+        from .work_service import _in_list
+        keys, args = _in_list([row["id"] for row in rows])
+        peers, parts = {}, {}
+        for row in connection.query("SELECT p.order_id,p.person_id,u.name,p.minutes "
+                                    "FROM participants p JOIN users u ON u.id=p.person_id "
+                                    "WHERE p.order_id IN " + keys + " ORDER BY u.name,p.person_id", args):
+            peers.setdefault(row["order_id"], []).append({
+                "personId": row["person_id"], "personName": row["name"], "minutes": row["minutes"],
+            })
+        for row in connection.query("SELECT op.order_id,p.id,p.code,p.name,p.unit,op.quantity_units "
+                                    "FROM order_parts op JOIN parts p ON p.id=op.part_id "
+                                    "WHERE op.order_id IN " + keys + " ORDER BY p.code,p.id", args):
+            parts.setdefault(row["order_id"], []).append({
+                "partId": row["id"], "code": row["code"], "name": row["name"], "unit": row["unit"],
+                "quantity": quantity_value(row["quantity_units"]),
+            })
+        return [{"orderId": row["id"], "workDate": row["work_date"], "type": row["type"],
+                 "title": row["title"], "description": row["description"], "assetName": row["asset_name"],
+                 "line": row["line"], "minutes": row["minutes"],
+                 "participants": peers.get(row["id"], []), "parts": parts.get(row["id"], [])}
+                for row in rows]
+
     def report(self, viewer, period=None, year=None, month=None, person_id=None, detail_page=None, detail_page_size=None, scope=None):
         from .work_service import WorkService
         from .pm_calendar import format_persian
-        from .permissions import can_view_personnel_reports
         WorkService._role(viewer)
         if scope not in (None, "own", "all"):
             raise ApiError(400, "حوزهٔ عملکرد باید شخصی یا همهٔ نفرات باشد.")
@@ -90,12 +165,14 @@ class PerformanceService:
         with self.db.transaction(write=False) as c:
             if person_id and not c.scalar("SELECT COUNT(*) FROM users u WHERE u.id=:person AND (" + staff_scope + ")", args):
                 raise ApiError(403, "عملکرد این فرد در حوزه دسترسی شما نیست.")
-            people = {entry["person_id"]: dict(entry, minutes=0, activity_count=0, pm=0, em=0, project=0, unscored_count=0, raw_score_text="0") for entry in c.query("SELECT u.id AS person_id,u.name,u.code,u.specialty,u.active FROM users u WHERE u.active=1 AND (" + staff_scope + ")", args)}
+            people = {entry["person_id"]: dict(entry, minutes=0, activity_count=0, pm=0, em=0, project=0, cm=0, general=0, unscored_count=0, raw_score_text="0") for entry in c.query("SELECT u.id AS person_id,u.name,u.code,u.specialty,u.active FROM users u WHERE u.active=1 AND (" + staff_scope + ")", args)}
             aggregates = """SELECT u.id AS person_id,u.name,u.code,u.specialty,u.active,
 COALESCE(SUM(CAST(p.minutes AS BIGINT)),0) AS minutes,COUNT(*) AS activity_count,
 COALESCE(SUM(CASE WHEN o.type='PM' THEN 1 ELSE 0 END),0) AS pm,
 COALESCE(SUM(CASE WHEN o.type='EM' THEN 1 ELSE 0 END),0) AS em,
 COALESCE(SUM(CASE WHEN o.type='PROJECT' THEN 1 ELSE 0 END),0) AS project,
+COALESCE(SUM(CASE WHEN o.type='CM' THEN 1 ELSE 0 END),0) AS cm,
+COALESCE(SUM(CASE WHEN o.type='GENERAL' THEN 1 ELSE 0 END),0) AS general,
 COALESCE(SUM(CASE WHEN (f.supervisor_coefficient IS NULL AND COALESCE(f.source,'')<>'head-only') OR f.head_coefficient IS NULL THEN 1 ELSE 0 END),0) AS unscored_count,""" + score_aggregate(c.is_sqlite) + " AS raw_score_text " + FACT_JOINS + where + " GROUP BY u.id,u.name,u.code,u.specialty,u.active"
             for entry in c.query(aggregates, args):
                 people[entry["person_id"]] = entry
@@ -110,7 +187,7 @@ COALESCE(SUM(CASE WHEN (f.supervisor_coefficient IS NULL AND COALESCE(f.source,'
             details = [{"orderId": row["order_id"], "number": row["number"], "workDate": row["work_date"], "jalaliDate": format_persian(date.fromisoformat(row["work_date"])), "type": row["type"], "title": row["title"], "personId": row["person_id"], "personName": row["person_name"], "specialty": row["specialty"], "minutes": row["minutes"], "hours": hours(row["minutes"]), "supervisorCoefficient": stored_decimal(row["supervisor_coefficient"]) if row["supervisor_coefficient"] is not None else None, "headCoefficient": stored_decimal(row["head_coefficient"]) if row["head_coefficient"] is not None else None, "score": round_score(stored_decimal(row["score_raw"])) if row["score_raw"] is not None else None, "source": row["source"]} for row in detail_rows]
             years = available_years(c, work_scope, args)
             activity_count = c.scalar("SELECT COUNT(DISTINCT o.id) " + BASIC_JOINS + where, args)
-        result_people = [{"personId": p["person_id"], "name": p["name"], "code": p["code"], "specialty": p["specialty"], "active": bool(p["active"]), "minutes": p["minutes"], "hours": hours(p["minutes"]), "activityCount": p["activity_count"], "score": round_score(parse_score(p["raw_score_text"])), "pm": p["pm"], "em": p["em"], "project": p["project"], "unscoredCount": p["unscored_count"]} for p in ranked]
+        result_people = [{"personId": p["person_id"], "name": p["name"], "code": p["code"], "specialty": p["specialty"], "active": bool(p["active"]), "minutes": p["minutes"], "hours": hours(p["minutes"]), "activityCount": p["activity_count"], "score": round_score(parse_score(p["raw_score_text"])), "pm": p["pm"], "em": p["em"], "project": p["project"], "cm": p["cm"], "general": p["general"], "unscoredCount": p["unscored_count"]} for p in ranked]
         minutes = sum(p["minutes"] for p in result_people)
         return {"period": selected, "scope": scope,
                 "formula": "برای تکنسین: نمره سرپرست × نمره رئیس × ساعت فرد؛ برای کار سرپرست: نمره رئیس (۰ تا ۹) × ساعت فرد", "years": years, "people": result_people,
