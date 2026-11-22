@@ -24,7 +24,8 @@ const ui=encode(`
 `);
 const catalog=encode(`export const CatalogSelect=()=>null,PageControls=()=>null,emptyPage=()=>({items:[],total:0,page:1,totalPages:1});`);
 const api=encode(`export class ApiError extends Error {} const blocked=()=>{throw new Error('Static task rendering must never call a backend');}; export const api=blocked,download=blocked,post=blocked,put=blocked;`);
-const responsibility=encode(compile('PmResponsibility.tsx',{'react':resolve('react'),'react/jsx-runtime':resolve('react/jsx-runtime'),'./api':api,'./Catalog':catalog,'./ui':ui}));
+const ownerSelect=encode(compile('PmSupervisorSelect.tsx',{'react':resolve('react'),'react/jsx-runtime':resolve('react/jsx-runtime'),'./Catalog':catalog,'./ui':ui}));
+const responsibility=encode(compile('PmResponsibility.tsx',{'react':resolve('react'),'react/jsx-runtime':resolve('react/jsx-runtime'),'./api':api,'./PmSupervisorSelect':ownerSelect,'./ui':ui}));
 const source=compile('PmWork.tsx',{
  'react':resolve('react'),'react/jsx-runtime':resolve('react/jsx-runtime'),'./api':api,'./Catalog':catalog,'./ui':ui,'./Time24':encode('export default()=>null;'),
  './Orders':encode('export const OrderDetail=()=>null;'),'./PmLibrary':encode('export const PmSheetView=()=>null;'),

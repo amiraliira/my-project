@@ -6,7 +6,7 @@ import type { PageProps } from './Orders';
 import type { OrderPart, Part, User, WorkOrder } from './types';
 import { validQuantity } from './quantities';
 import { SupervisorGradeInputs } from './Grading';
-import { participantGradePayload } from './scoring';
+import { approvalParticipants, participantGradePayload } from './scoring';
 import { ErrorBox, Field, Icon, Modal, duration, errorText, num } from './ui';
 
 interface DraftPart { partId: string; code?: string; name?: string; unit?: string; quantity: string; }
@@ -23,6 +23,9 @@ function quantity(value: string) {
 
 export function correctionPayload(order: WorkOrder, user: User, draft: CorrectionDraft) {
  if (user.role !== 'supervisor' || !user.specialty || order.canReviewCorrect !== true) throw new Error('این گزارش در مرحلهٔ قابل اصلاح شما نیست.');
+ if (approvalParticipants(order, 'supervisor').some(person => person.personId === user.id)) {
+  throw new Error('تأیید این گزارش باید با سرپرست دیگری از همین تخصص انجام شود.');
+ }
  const reason = draft.reason.trim();
  if (reason.length > 2000) throw new Error('توضیح حداکثر ۲۰۰۰ نویسه است.');
  if (![draft.startTime, draft.endTime].every(value => /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value))) throw new Error('زمان واقعی شروع و پایان را کامل کنید.');
@@ -40,7 +43,7 @@ export function correctionPayload(order: WorkOrder, user: User, draft: Correctio
  const partsKey = (rows: { partId: string; quantity: number | string }[]) => JSON.stringify(rows.map(part => [part.partId, Number(part.quantity)]).sort((a, b) => String(a[0]).localeCompare(String(b[0]))));
  const changed = draft.startTime !== order.startTime || draft.endTime !== order.endTime || participants.some(person => person.minutes !== order.participants.find(old => old.personId === person.personId)?.minutes) || partsKey(parts) !== partsKey(order.parts);
  if (changed && reason.length < 3) throw new Error('علت اصلاح زمان یا قطعات را بنویسید؛ حداقل سه نویسه.');
- const grades = participantGradePayload(order, draft.grades, 'supervisor');
+ const grades = participantGradePayload(order, draft.grades, 'supervisor', user.id);
  if (!grades?.grades) throw new Error('نمرهٔ جداگانهٔ همهٔ مجریان تخصص خودتان را از صفر تا سه کامل کنید.');
  return { version: order.version, reason, startTime: draft.startTime, endTime: draft.endTime, participants, parts, grades: grades.grades };
 }

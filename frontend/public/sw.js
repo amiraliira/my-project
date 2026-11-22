@@ -1,5 +1,5 @@
 /* Only the application shell and static files are cached. API responses are never cached. */
-const CACHE = 'pak-static-python-v2.0.0-rc12';
+const CACHE = 'pak-static-python-2.0.0-rc13-r2';
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(['/icon.svg', '/pak-logo.png', '/manifest.webmanifest']))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('pak-static-') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', event => {

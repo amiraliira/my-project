@@ -7,7 +7,7 @@ const compiled = ts.transpileModule(readFileSync(new URL('../src/compatibility.t
  compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
 }).outputText;
 const { candidateRelease, startWithCompatibleBackend, requiredCapabilities } = await import('data:text/javascript;base64,' + Buffer.from(compiled).toString('base64'));
-const candidate = { status: 'ok', apiVersion: 7, databaseProvider: 'postgresql', databaseVersionNum: 170011, schemaVersion: 10, capabilities: [...requiredCapabilities], releaseStage: 'candidate', productionAccepted: false };
+const candidate = { status: 'ok', apiVersion: 8, databaseProvider: 'postgresql', databaseVersionNum: 170011, schemaVersion: 12, capabilities: [...requiredCapabilities], releaseStage: 'candidate', productionAccepted: false };
 
 test('complete candidate remains usable while its production acceptance stays visible', async () => {
  let sessions = 0;
@@ -41,5 +41,13 @@ test('archive interface refuses older database schema or backend without immutab
   let sessions = 0;
   const result = await startWithCompatibleBackend(async () => health, async () => { sessions++; });
   assert.equal(result.compatible, false); assert.equal(sessions, 0);
+ }
+});
+
+test('cross-team PM interface rejects schema 10 and a backend without cross-team responsibility support', async () => {
+ for (const health of [{...candidate,schemaVersion:10},{...candidate,capabilities:candidate.capabilities.filter(value=>value!=='pm-responsibility-cross-team')}]) {
+  let sessions=0;
+  const result=await startWithCompatibleBackend(async()=>health,async()=>{sessions++;});
+  assert.equal(result.compatible,false);assert.equal(sessions,0);
  }
 });

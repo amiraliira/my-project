@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ApiError, download, post, put } from './api';
 import { CatalogSelect, ServerTable, emptyPage } from './Catalog';
+import PmSupervisorSelect from './PmSupervisorSelect';
 import { JalaliDate } from './JalaliDate';
 import type { PageProps } from './Orders';
 import type { PageResult } from './types';
@@ -182,13 +183,13 @@ export default function PmLibrary(context: PageProps) {
    <div className="pm-toolbar"><SearchInput value={q} onChange={setQ} placeholder={tab === 'templates' ? 'جستجوی برگه، دوره یا سالن…' : 'جستجوی برنامه، برگه یا سالن…'}/><button type="button" className="button ghost small" onClick={reload} disabled={templates.loading && tab === 'templates' || plans.loading && tab === 'plans'}><Icon name="refresh" size={17}/>تازه‌سازی</button><span className="pm-count">هر صفحه حداکثر ۲۵ مورد</span></div>
    {tab === 'templates' ? <><ErrorBox text={templates.error} retry={templates.reload}/>{templates.loading ? <Loading/> : <ServerTable result={templates.data} changePage={setTemplatePage} rowKey={item => item.id} columns={[
     { title: 'برگه', cell: item => <><b className="pm-row-title">{item.title}</b><small>نسخهٔ {num(item.version, 0)}</small></> },
-    { title: 'واحد / محل', cell: item => <>{item.specialty}<small>{item.hall || 'محل تعیین نشده'}</small></> },
+    { title: 'تخصص برگه / محل', cell: item => <>{item.specialty}<small>{item.hall || 'محل تعیین نشده'}</small></> },
     { title: 'دورهٔ درج‌شده', cell: item => item.period || 'در منبع مشخص نشده' },
     { title: 'تطبیق', cell: item => <div className="pm-badges"><MappingBadge status={item.mappingStatus} issues={item.issues}/>{item.issues.length > 0 && <small>{num(item.issues.length, 0)} مورد نیازمند بررسی</small>}</div> },
     { title: 'عملیات', cell: item => <button className="button ghost small" onClick={() => setTemplateId(item.id)}>مشاهدهٔ اصل جدول{canManage(context.user.role) ? ' و بازبینی' : ''}</button> }
    ]} empty={<Empty title="برگه‌ای در کتابخانه نیست" detail={search ? 'نام دیگری جستجو کنید.' : 'با ورود برگه‌ها برای بازبینی، قالب‌های اصلی در این فهرست قرار می‌گیرند.'} icon="plans"/>}/>}</> : <><ErrorBox text={plans.error} retry={plans.reload}/>{plans.loading ? <Loading/> : <ServerTable result={plans.data} changePage={setPlanPage} rowKey={item => item.id} columns={[
     { title: 'برنامه / برگه', cell: item => <><b className="pm-row-title">{item.title}</b><small>{item.templateTitle}</small></> },
-    { title: 'واحد / محل', cell: item => <>{item.specialty}<small>{item.hall || 'محل تعیین نشده'}</small></> },
+    { title: 'تخصص برگه / محل', cell: item => <>{item.specialty}<small>{item.hall || 'محل تعیین نشده'}</small></> },
     { title: 'شروع برنامه', cell: item => dateFa(item.startDate) },
     { title: 'نوبت‌های ماهانه', cell: item => item.slots.length ? <>{num(item.slots.length, 0)} نوبت<small>{item.slots.slice(0, 2).map(slotLabel).join('، ')}{item.slots.length > 2 ? '…' : ''}</small></> : <span className="negative">هفته تعیین نشده</span> },
     { title: 'وضعیت', cell: item => <div className="pm-badges"><span className={'pm-status ' + (item.active ? 'ready' : 'pending')}>{item.active ? 'فعال' : 'غیرفعال'}</span>{!item.mappingConfirmed && <span className="pm-status blocked">تطبیق تأیید نشده</span>}</div> },
@@ -245,7 +246,7 @@ function PlanEditor({ detail, context, close, saved, reload }: { detail: PmPlan;
  const [active, setActive] = useState(detail.active), [mappingConfirmed, setMappingConfirmed] = useState(detail.mappingConfirmed), [month, setMonth] = useState(detail.slots[0]?.month || 1), [reason, setReason] = useState('');
  const [busy, setBusy] = useState(false), [error, setError] = useState(''), [conflict, setConflict] = useState(false);
  const canEdit = canManage(context.user.role), mayActivate = detail.calendarEligible !== false && mappingConfirmed && !!assetId && !!supervisorId && slots.length > 0 && !!startDate;
- const blockers = [detail.calendarEligible === false ? 'مبنای این برگه برای صدور تقویمی مشخص نشده است؛ برنامهٔ وابسته به ساعت دستگاه باید جداگانه تعیین تکلیف شود.' : '', !assetId ? 'تجهیز این برگه تعیین نشده است.' : '', !supervisorId ? 'سرپرست این تخصص تعیین نشده است.' : '', !slots.length ? 'ماه و هفتهٔ اجرای برنامه تعیین نشده است.' : '', !mappingConfirmed ? 'تطبیق برگه و برنامه هنوز توسط رئیس تأیید نشده است.' : '', !startDate ? 'تاریخ شروع برنامه تعیین نشده است.' : ''].filter(Boolean);
+ const blockers = [detail.calendarEligible === false ? 'مبنای این برگه برای صدور تقویمی مشخص نشده است؛ برنامهٔ وابسته به ساعت دستگاه باید جداگانه تعیین تکلیف شود.' : '', !assetId ? 'تجهیز این برگه تعیین نشده است.' : '', !supervisorId ? 'سرپرست مسئول انجام تعیین نشده است.' : '', !slots.length ? 'ماه و هفتهٔ اجرای برنامه تعیین نشده است.' : '', !mappingConfirmed ? 'تطبیق برگه و برنامه هنوز توسط رئیس تأیید نشده است.' : '', !startDate ? 'تاریخ شروع برنامه تعیین نشده است.' : ''].filter(Boolean);
  const toggleSlot = (week: number) => { setSlots(current => current.some(slot => slot.month === month && slot.week === week) ? current.filter(slot => slot.month !== month || slot.week !== week) : [...current, { month, week }].sort((a, b) => a.month - b.month || a.week - b.week)); };
  return <Modal title={canEdit ? 'بررسی و ویرایش زمان‌بندی PM' : 'مشاهدهٔ زمان‌بندی PM'} close={close} wide locked={busy}>
   <form onSubmit={async event => {
@@ -262,7 +263,7 @@ function PlanEditor({ detail, context, close, saved, reload }: { detail: PmPlan;
     {conflict && <div className="pm-conflict"><p>برنامه هم‌زمان تغییر کرده است. انتخاب‌ها و علت واردشدهٔ شما حفظ شده؛ پس از نگه‌داشتن تغییرات، نسخهٔ جدید را دریافت کنید.</p><button type="button" className="button secondary small" onClick={reload}>کنارگذاشتن تغییرات و دریافت نسخهٔ جدید</button></div>}
     <fieldset className="modal-operation" disabled={!canEdit || busy}><div className="pm-form-grid">
      <Field label="تجهیز برگه" hint="تطبیق تجهیز با متن و کد اصل برگه را بررسی کنید."><CatalogSelect kind="assets" value={assetId} onChange={value => { setAssetId(value); setMappingConfirmed(false); setActive(false); }} disabled={!canEdit || busy}/></Field>
-     <Field label={'سرپرست واحد ' + detail.specialty}><CatalogSelect kind="people" value={supervisorId} onChange={value => { setSupervisorId(value); setMappingConfirmed(false); setActive(false); }} filters={{ role: 'supervisor', specialty: detail.specialty, active: 'true' }} disabled={!canEdit || busy}/></Field>
+     <PmSupervisorSelect value={supervisorId} onChange={value => { setSupervisorId(value); setMappingConfirmed(false); setActive(false); }} disabled={!canEdit || busy}/>
      <Field label="تاریخ شروع برنامه — شمسی"><JalaliDate value={startDate} onChange={setStartDate}/></Field>
      <Field label="تاریخ انتخاب‌شده"><div className="pm-single-assignee">{dateFa(startDate)}</div></Field>
      <Field label="ماه شمسی برای انتخاب هفته‌ها" wide><select value={month} onChange={event => setMonth(Number(event.target.value))}>{monthNames.map((name, index) => <option key={name} value={index + 1}>{name}</option>)}</select></Field>

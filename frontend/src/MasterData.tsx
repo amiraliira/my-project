@@ -4,7 +4,7 @@ import { CatalogSelect, ServerTable, emptyPage } from './Catalog';
 import { post, put } from './api';
 import type { Asset, Consumption, PageResult, Part, Plan, User } from './types';
 import type { PageProps } from './Orders';
-import { AssetHistory } from './Orders';
+import { AssetHistory, OrderDetail } from './Orders';
 import { PartsImport } from './PartsImport';
 import { Empty, ErrorBox, Field, Icon, Loading, Modal, PageHeader, SearchInput, dateFa, errorText, num, roles, todayIso, useDebounce, useResource } from './ui';
 
@@ -22,6 +22,8 @@ function AssetEditor({ context, existing, close, saved }: { context: PageProps; 
 
 export function PartsConsumption(context: PageProps) {
  const [tab, setTab] = useState<'parts' | 'consumption'>('parts'), [q, setQ] = useState(''), [edit, setEdit] = useState<Part | 'new' | null>(null);
+ const [report, setReport] = useState('');
+ const closeReport = useCallback(() => setReport(''), []);
  const [importing, setImporting] = useState(false); const closeImport = useCallback(() => setImporting(false), []);
  const close = useCallback(() => setEdit(null), []), search = useDebounce(q);
  const [page, setPage] = useState(1);
@@ -44,12 +46,14 @@ export function PartsConsumption(context: PageProps) {
    ]} empty={<Empty title="قطعه‌ای پیدا نشد" detail="نام یا کد دیگری جستجو کنید." icon="stock"/>}/>}</> : <><ErrorBox text={consumption.error} retry={consumption.reload}/>{consumption.loading ? <Loading/> : <ServerTable result={consumption.data} changePage={setPage} rowKey={c => c.id} columns={[
     { title: 'کد انبار / قطعه', cell: c => <><b>{c.partName}</b><small className="muted mono">{c.partCode}</small></> },
     { title: 'مقدار مصرف', cell: c => <><b>{num(c.quantity, 6)}</b><small className="muted">{c.unit || 'واحد ثبت نشده'}</small></> },
-    { title: 'شماره گزارش', cell: c => <span className="mono">{c.orderNumber}</span> },
+    { title: 'گزارش کار', cell: c => <button type="button" className="text-button" onClick={() => setReport(c.orderId)}>مشاهده گزارش</button> },
     { title: 'تاریخ انجام کار', cell: c => dateFa(c.executedAt) },
     { title: 'تأییدکننده نهایی', cell: c => c.actorName },
     { title: 'زمان تأیید نهایی', cell: c => dateFa(c.approvedAt, true) }
    ]} empty={<Empty title="مصرف تأییدشده‌ای ثبت نشده" detail="قطعات گزارش‌ها پس از تأیید نهایی در اینجا نمایش داده می‌شوند." icon="stock"/>}/>}</>}
-  </div>{edit && <PartEditor context={context} existing={edit === 'new' ? undefined : edit} close={close} saved={reload}/>} {importing && <PartsImport close={closeImport} saved={async () => { reload(); await context.refresh(); }} notify={context.notify}/>}</>;
+  </div>{edit && <PartEditor context={context} existing={edit === 'new' ? undefined : edit} close={close} saved={reload}/>} {importing && <PartsImport close={closeImport} saved={async () => { reload(); await context.refresh(); }} notify={context.notify}/>}
+  {report && <OrderDetail id={report} context={context} close={closeReport} changed={reload} edit={() => {}}/>}
+ </>;
 }
 function PartEditor({ context, existing, close, saved }: { context: PageProps; existing?: Part; close: () => void; saved: () => void }) {
  const [form, set] = useState({ code: existing?.code || '', name: existing?.name || '', specification: existing?.specification || '', unit: existing?.unit || '', unitCost: existing?.unitCost == null ? '' : String(existing.unitCost) }), [busy, setBusy] = useState(false), [error, setError] = useState('');

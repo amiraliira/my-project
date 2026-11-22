@@ -12,7 +12,7 @@ const compile = (name, imports = {}) => {
  for (const [name, replacement] of Object.entries(imports)) source = source.replaceAll(JSON.stringify(name), JSON.stringify(replacement)).replaceAll("'" + name + "'", JSON.stringify(replacement));
  return source;
 };
-const scoringUrl = encode(compile('scoring.ts')), permissionsUrl = encode(compile('permissions.ts'));
+const scoringUrl = encode(compile('scoring.ts', { './clock24': encode(compile('clock24.ts')) })), permissionsUrl = encode(compile('permissions.ts'));
 const scoring = await import(scoringUrl), permissions = await import(permissionsUrl);
 const uiUrl = encode(`import {createElement as h} from ${fileImport('react')};
  export const num = value => String(value ?? 0), dateFa = value => value || '—';
@@ -41,6 +41,23 @@ test('supervisor grade payload stays confined to their specialty', () => {
  assert.equal(scoring.participantGradePayload({ ...order, decisionSpecialty: null }, { m1: '3', m2: '3' }, 'supervisor'), null);
 });
 
+test('Persian and Arabic grade entry activates a complete decision, including zero', () => {
+ assert.deepEqual(scoring.participantGradePayload(order, { m1: '۰', m2: '١٫٢٥', e1: '3' }, 'supervisor', 'reviewer'),
+  { grades: [{ personId: 'm1', coefficient: '0' }, { personId: 'm2', coefficient: '1.25' }] });
+ assert.equal(scoring.participantGradePayload(order, { m1: '۳٫۰۰۰۰۰۰۰۰۰۰۰۰۰۰۰۰۰۰۰۰۰۱', m2: '۰' }, 'supervisor', 'reviewer'), null);
+ const html = renderToStaticMarkup(createElement(grades.SupervisorGradeInputs, { order, context: context('supervisor'),
+  values: { m1: '۰', m2: '١٫٢٥' }, setValues() {}, busy: false }));
+ assert.equal((html.match(/inputMode="decimal"/g) || []).length, 2);
+ assert.match(html, /value="۰"/);
+});
+
+test('the same frozen legacy grade set requires a different reviewer when it includes the actor', () => {
+ const values = { m1: '0', m2: '2' };
+ assert.deepEqual(scoring.approvalParticipants(order, 'supervisor').map(person => person.personId), ['m1', 'm2']);
+ assert.equal(scoring.participantGradePayload(order, values, 'supervisor', 'm1'), null);
+ assert.equal(scoring.participantGradePayload(order, values, 'supervisor', 'another-supervisor').grades.length, 2);
+});
+
 test('individual head evidence and canonical final scores override a historical shared value', () => {
  const completed = { ...order, status: 'completed', headCoefficient: 2 };
  assert.equal(scoring.headGrade(completed, 'm1').coefficient, 0);
@@ -52,7 +69,7 @@ test('individual head evidence and canonical final scores override a historical 
 
 test('head inputs show every person, their own supervisor grade, and no shared head input', () => {
  const html = renderToStaticMarkup(createElement(grades.HeadGradeInputs, { order, context: context('head'), values: { m1: '0', m2: '1.25', e1: '3' }, setValues() {}, busy: false }));
- assert.equal((html.match(/type="number"/g) || []).length, 3);
+ assert.equal((html.match(/type="text"/g) || []).length, 3);
  for (const name of ['مکانیک اول', 'مکانیک دوم', 'برق اول']) assert.match(html, new RegExp('نمره رئیس برای ' + name));
  assert.match(html, /نمرهٔ سرپرست/); assert.match(html, /value="0"/); assert.match(html, /value="1.25"/);
 });
@@ -86,7 +103,7 @@ test('head-only performers use a frozen per-person range and no synthetic superv
  assert.equal(scoring.participantWorkScore({ ...mixed, status: 'completed' }, 'sm'), 8.5);
  assert.equal(scoring.supervisorGrade(mixed, 'sm'), null);
  const html = renderToStaticMarkup(createElement(grades.HeadGradeInputs, { order: mixed, context: context('head'), values: { sm: '8.5', m1: '3' }, setValues() {}, busy: false }));
- assert.match(html, /max="9"/); assert.match(html, /max="3"/);
+ assert.match(html, /placeholder="0 – 9"/); assert.match(html, /placeholder="0 – 3"/);
  assert.match(html, /کار سرپرست · ارزیابی مستقیم رئیس/);
  const supervisor = renderToStaticMarkup(createElement(grades.SupervisorGradeInputs, { order: mixed, context: context('supervisor'), values: { m1: '2' }, setValues() {}, busy: false }));
  assert.doesNotMatch(supervisor, /نمره سرپرست برای سرپرست اجرایی/);

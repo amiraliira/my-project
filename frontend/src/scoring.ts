@@ -1,4 +1,5 @@
 import type { Participant, WorkOrder } from './types';
+import { time24Digits } from './clock24';
 
 export const isHeadOnly = (person: Participant) => person.gradingPolicy === 'head-only-v1';
 export const headGradeMaximum = (person: Participant) => isHeadOnly(person) ? 9 : 3;
@@ -33,12 +34,34 @@ export function headGrade(order: WorkOrder, personId: string) {
  return legacy == null ? null : { personId, specialty: participant?.specialty || '', coefficient: legacy, actorName: '', createdAt: '', source: 'legacy-order' as const };
 }
 
-export function participantGradePayload(order: WorkOrder, values: Record<string, string>, stage: 'supervisor' | 'head') {
- const people = stage === 'head' ? order.participants : order.participants.filter(person => !!order.decisionSpecialty && person.specialty === order.decisionSpecialty && !isHeadOnly(person));
- if (!people.length || !people.every(person => validCoefficient(values[person.personId] ?? '', stage === 'head' ? headGradeMaximum(person) : 3))) return null;
- // Keep decimal text intact; converting through a JavaScript Number would round long fractions.
- const scores = people.map(person => ({ personId: person.personId, coefficient: values[person.personId].trim() }));
+export function approvalParticipants(order: WorkOrder, stage: 'supervisor' | 'head') {
+ return stage === 'head' ? order.participants : order.participants.filter(person =>
+  !!order.decisionSpecialty && person.specialty === order.decisionSpecialty && !isHeadOnly(person));
+}
+
+export function participantGradePayload(order: WorkOrder, values: Record<string, string>, stage: 'supervisor' | 'head', actorId?: string) {
+ const people = approvalParticipants(order, stage);
+ if (!people.length || actorId && people.some(person => person.personId === actorId)) return null;
+ const scores: {personId: string; coefficient: string}[] = [];
+ for (const person of people) {
+  const coefficient = stage === 'head'
+   ? normalizeCoefficient(values[person.personId] ?? '', headGradeMaximum(person), 28)
+   : normalizeCoefficient(values[person.personId] ?? '');
+  if (coefficient === null) return null;
+  scores.push({ personId: person.personId, coefficient });
+ }
  return stage === 'head' ? { participantScores: scores } : { grades: scores };
 }
 
-export const validCoefficient = (value: string, maximum = 3) => value.trim() !== '' && Number.isFinite(Number(value)) && Number(value) >= 0 && Number(value) <= maximum;
+export function normalizeCoefficient(value: string, maximum = 3, fractionalLimit = 64): string | null {
+ const text = time24Digits(value).trim().replace(/[٫،,]/g, '.');
+ if (text.length > 64 || !/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(text)) return null;
+ const [whole, fractional = ''] = text.split('.');
+ const digits = fractional.replace(/0+$/, '');
+ // Compare the fractional tail exactly at the upper bound without floating-point rounding.
+ const integer = Number(whole);
+ if (integer > maximum || (integer === maximum && digits.length > 0) || digits.length > fractionalLimit) return null;
+ const canonicalWhole = whole.replace(/^0+/, '') || '0';
+ return digits ? canonicalWhole + '.' + digits : canonicalWhole;
+}
+

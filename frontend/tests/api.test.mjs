@@ -10,7 +10,7 @@ const apiUrl = encode(compile('api.ts').replace("'./compatibility'", JSON.string
 const client = await import(apiUrl), compatibility = await import(compatibilityUrl);
 const quantity = await import(encode(compile('quantities.ts')));
 const events = []; globalThis.window = { dispatchEvent: event => events.push(event.type) };
-const health = { status: 'ok', apiVersion: 7, databaseProvider: 'postgresql', databaseVersionNum: 170011, schemaVersion: 10, capabilities: [...compatibility.requiredCapabilities] };
+const health = { status: 'ok', apiVersion: 8, databaseProvider: 'postgresql', databaseVersionNum: 170011, schemaVersion: 12, capabilities: [...compatibility.requiredCapabilities] };
 
 test('new client blocks old list/catalog backend before protected workflows', () => {
  assert.equal(compatibility.compatibleBackend(health), true);

@@ -1,0 +1,37 @@
+.personnel-chart-link {
+ display: inline-flex;
+ align-items: center;
+ gap: 9px;
+ padding: 3px 0;
+ border: 0;
+ background: transparent;
+ color: inherit;
+ text-align: start;
+ font: inherit;
+}
+.personnel-chart-link > svg { flex: none; color: #4c729b; }
+.personnel-chart-link:hover b { color: #24588b; }
+.personnel-chart-link:focus-visible { outline: 2px solid #537fae; outline-offset: 4px; border-radius: 3px; }
+.personnel-own-chart { margin: 0 0 12px; }
+.personnel-activity-context,
+.personnel-hall-heading {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 10px 18px;
+ flex-wrap: wrap;
+}
+.personnel-activity-context > div {
+ display: inline-flex;
+ align-items: center;
+ gap: 8px;
+ color: #456b91;
+}
+.personnel-activity > h3,
+.personnel-hall-heading h3 {
+ font-size: 14px;
+ margin: 8px 0;
+ color: #315775;
+}
+.personnel-activity .activity-record-time { margin-bottom: 10px; }
+.personnel-activity .activity-materials + .activity-materials { margin-top: 8px; }

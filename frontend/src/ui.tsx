@@ -5,7 +5,15 @@ import { api, currentSessionGeneration } from './api';
 
 export const roles: Record<string, string> = { technician: 'تکنسین', supervisor: 'سرپرست', planner: 'کارشناس نت', head: 'رئیس فنی', manager: 'مدیر فنی', admin: 'مدیر سامانه' };
 export const statuses: Record<string, string> = { draft: 'پیش‌نویس', submitted: 'ارسال‌شده', supervisor: 'تأیید سرپرستان', planner: 'تأیید کارشناس نت', head: 'تأیید رئیس یا مدیر فنی', completed: 'تکمیل نهایی', returned: 'برگشت برای اصلاح', cancelled: 'لغوشده' };
-export const workTypes: Record<string, string> = { PM: 'پیشگیرانه', EM: 'رفع خرابی', PROJECT: 'پروژه' };
+export const workTypes: Record<string, string> = { PM: 'نگهداری پیشگیرانه', EM: 'رفع خرابی اضطراری', CM: 'تعمیرات اصلاحی', GENERAL: 'امور محوله', PROJECT: 'پروژه' };
+
+export function reportEquipment(order: { type: string; assetId: string; assetCode?: string; assetName?: string; line?: string }) {
+ if (order.type === 'GENERAL' || (!order.line?.trim() && (
+  order.assetName === 'سایر — کارهای عمومی' || order.assetName === 'امور عمومی' || order.assetName === workTypes.GENERAL ||
+  (order.assetId?.startsWith('general-hall-') && order.assetCode?.startsWith('GENERAL-'))
+ ))) return '';
+ return [order.assetCode, order.assetName].filter(Boolean).join(' · ');
+}
 const numberFormats = new Map<number, Intl.NumberFormat>();
 const dateFormats = [false, true].map(time => new Intl.DateTimeFormat('fa-IR', { timeZone: 'Asia/Tehran', year: 'numeric', month: 'short', day: 'numeric', ...(time ? { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' as const } : {}) }));
 const isoFormat = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tehran', year: 'numeric', month: '2-digit', day: '2-digit' });

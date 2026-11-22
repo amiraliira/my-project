@@ -10,10 +10,12 @@ const encode=source=>'data:text/javascript;base64,'+Buffer.from(source).toString
 const resolve=name=>pathToFileURL(require.resolve(name)).href;
 function compile(name,imports={}) {
  let source=ts.transpileModule(readFileSync(new URL('../src/'+name,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ source=source.replace(/^import '\.\/[^']+\.css';\r?\n/gm,'');
  for(const [name,url] of Object.entries(imports))source=source.replaceAll(JSON.stringify(name),JSON.stringify(url)).replaceAll("'"+name+"'",JSON.stringify(url));
  return source;
 }
 const uiUrl=encode(`
+export const reportEquipment=order=>order.assetName||'';
  import {createElement as h} from ${JSON.stringify(resolve('react'))};
  let report=null,options={},requests=[],reloads=0;
  export const configure=(value,settings={})=>{report=value;options=settings;requests=[];reloads=0;};
@@ -52,7 +54,7 @@ test('all six roles see a loaded personal summary with details initially collaps
  }
 });
 
-const hooksUrl=encode(`let slots=[],cursor=0;export const reset=()=>{slots=[];cursor=0;},begin=()=>{cursor=0;};export function useState(initial){const index=cursor++;if(!(index in slots))slots[index]=typeof initial==='function'?initial():initial;return [slots[index],value=>{slots[index]=typeof value==='function'?value(slots[index]):value;}];}export function useRef(initial){const index=cursor++;return slots[index]??(slots[index]={current:initial});}export const useMemo=callback=>callback(),useEffect=()=>{};`);
+const hooksUrl=encode(`export {lazy,Suspense} from ${JSON.stringify(resolve('react'))};let slots=[],cursor=0;export const reset=()=>{slots=[];cursor=0;},begin=()=>{cursor=0;};export function useState(initial){const index=cursor++;if(!(index in slots))slots[index]=typeof initial==='function'?initial():initial;return [slots[index],value=>{slots[index]=typeof value==='function'?value(slots[index]):value;}];}export function useRef(initial){const index=cursor++;return slots[index]??(slots[index]={current:initial});}export const useMemo=callback=>callback(),useEffect=()=>{};`);
 const hooks=await import(hooksUrl);
 const interactive=await import(encode(compile('Performance.tsx',{...performanceImports,'react':hooksUrl})));
 function nodes(element) {

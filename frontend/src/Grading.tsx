@@ -2,7 +2,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import type { PageProps } from './Orders';
 import type { WorkOrder } from './types';
 import { DataTable, Field, dateFa, num } from './ui';
-import { headGrade, headGradeMaximum, isHeadOnly, supervisorGrade, validCoefficient } from './scoring';
+import { approvalParticipants, headGrade, headGradeMaximum, isHeadOnly, normalizeCoefficient, supervisorGrade } from './scoring';
 import { mayViewGrades } from './permissions';
 
 export function ParticipantGrades({ order, context }: { order: WorkOrder; context: PageProps }) {
@@ -21,16 +21,59 @@ export function ParticipantGrades({ order, context }: { order: WorkOrder; contex
  ]}/>{chief && <p className="management-note">تکنسین: نمرهٔ سرپرست × نمرهٔ رئیس × ساعت فرد. کار سرپرست: نمرهٔ رئیس (۰ تا ۹) × ساعت فرد.</p>}</section>;
 }
 
-export function SupervisorGradeInputs({ order, context, values, setValues, busy }: { order: WorkOrder; context: PageProps; values: Record<string, string>; setValues: Dispatch<SetStateAction<Record<string, string>>>; busy: boolean }) {
- const people = order.participants.filter(person => !!order.decisionSpecialty && person.specialty === order.decisionSpecialty && !isHeadOnly(person) && person.personId !== context.user.id);
- return <div className="individual-grade-inputs"><p className="management-note">فقط برای انجام‌دهندگانی که به نمرهٔ سرپرست نیاز دارند، نمره جداگانه وارد کنید. کار خود سرپرستان را رئیس ارزیابی می‌کند. مقدار صفر و اعداد اعشاری مانند <span dir="ltr">0.5</span> و <span dir="ltr">1.25</span> مجازند؛ بازه از ۰ تا ۳ است.</p>{people.map(person => { const name = person.personName || context.boot.people.find(entry => entry.id === person.personId)?.name || person.personId; return <div className="individual-grade-row" key={person.personId}><div><b>{name}</b><small>{person.specialty} · {num(person.minutes, 0)} دقیقه مشارکت</small></div><Field label={'نمره سرپرست برای ' + name}><input type="number" min="0" max="3" step="any" inputMode="decimal" dir="ltr" disabled={busy} required value={values[person.personId] ?? ''} placeholder="0 – 3" onChange={event => { const value = event.target.value; setValues(current => ({ ...current, [person.personId]: value })); }}/></Field></div>; })}</div>;
+interface GradeInputProps {
+ order: WorkOrder;
+ context: PageProps;
+ values: Record<string, string>;
+ setValues: Dispatch<SetStateAction<Record<string, string>>>;
+ busy: boolean;
 }
 
-export function HeadGradeInputs({ order, context, values, setValues, busy }: { order: WorkOrder; context: PageProps; values: Record<string, string>; setValues: Dispatch<SetStateAction<Record<string, string>>>; busy: boolean }) {
+function CoefficientInput({ value, maximum, fractionalLimit, busy, onChange }: {
+ value: string; maximum: number; fractionalLimit?: number; busy: boolean; onChange: (value: string) => void;
+}) {
+ const invalid = !!value.trim() && normalizeCoefficient(value, maximum, fractionalLimit) === null;
+ return <>
+  <input type="text" inputMode="decimal" autoComplete="off" dir="ltr" maxLength={64}
+   disabled={busy} required aria-invalid={invalid || undefined} value={value}
+   placeholder={'0 – ' + maximum} onChange={event => onChange(event.target.value)}/>
+  {invalid && <small className="grade-input-error">نمره‌ای بین صفر و {num(maximum, 0)} وارد کنید.</small>}
+ </>;
+}
+
+export function SupervisorGradeInputs({ order, context, values, setValues, busy }: GradeInputProps) {
+ const people = approvalParticipants(order, 'supervisor').filter(person => person.personId !== context.user.id);
+ return <div className="individual-grade-inputs">
+  <p className="management-note">برای هر نفر نمره‌ای از ۰ تا ۳ وارد کنید. صفر و اعشار، مثل ۱٫۲۵، پذیرفته می‌شوند.</p>
+  {people.map(person => {
+   const name = person.personName || context.boot.people.find(entry => entry.id === person.personId)?.name || person.personId;
+   return <div className="individual-grade-row" key={person.personId}>
+    <div><b>{name}</b><small>{person.specialty} · {num(person.minutes, 0)} دقیقه مشارکت</small></div>
+    <Field label={'نمره سرپرست برای ' + name}>
+     <CoefficientInput value={values[person.personId] ?? ''} maximum={3} busy={busy}
+      onChange={value => setValues(current => ({ ...current, [person.personId]: value }))}/>
+    </Field>
+   </div>;
+  })}
+ </div>;
+}
+
+export function HeadGradeInputs({ order, context, values, setValues, busy }: GradeInputProps) {
  return <div className="individual-grade-inputs"><p className="management-note">نمرهٔ رئیس برای کار تکنسین از ۰ تا ۳ و برای کار خودِ سرپرست از ۰ تا ۹ است؛ صفر و اعشار مجازند.</p>{order.participants.map(person => {
   const name = person.personName || context.boot.people.find(entry => entry.id === person.personId)?.name || person.personId;
   const supervisor = supervisorGrade(order, person.personId), value = values[person.personId] ?? '', direct = isHeadOnly(person), maximum = headGradeMaximum(person);
-  const score = direct ? person.minutes / 60 * Number(value) : supervisor ? person.minutes / 60 * supervisor.coefficient * Number(value) : null;
-  return <div className="individual-grade-row" key={person.personId}><div><b>{name}</b><small>{person.specialty} · {num(person.minutes, 0)} دقیقه مشارکت</small><small>{direct ? 'کار سرپرست · ارزیابی مستقیم رئیس' : <>نمرهٔ سرپرست: <b>{supervisor == null ? 'ثبت نشده' : num(supervisor.coefficient, 12)}</b></>}</small></div><Field label={'نمره رئیس برای ' + name + (direct ? ' (۰ تا ۹)' : ' (۰ تا ۳)')}><input type="number" min="0" max={maximum} step="any" inputMode="decimal" dir="ltr" disabled={busy} required value={value} placeholder={'0 – ' + maximum} onChange={event => { const next = event.target.value; setValues(current => ({ ...current, [person.personId]: next })); }}/>{score != null && validCoefficient(value, maximum) && <small>امتیاز این فعالیت پس از تأیید: {num(score, 3)}</small>}</Field></div>;
+  const coefficient = normalizeCoefficient(value, maximum, 28);
+  const weight = direct ? 1 : supervisor?.coefficient;
+  const score = coefficient === null || weight == null ? null : person.minutes / 60 * weight * Number(coefficient);
+  return <div className="individual-grade-row" key={person.personId}>
+   <div><b>{name}</b><small>{person.specialty} · {num(person.minutes, 0)} دقیقه مشارکت</small>
+    <small>{direct ? 'کار سرپرست · ارزیابی مستقیم رئیس' : <>نمرهٔ سرپرست: <b>{supervisor == null ? 'ثبت نشده' : num(supervisor.coefficient, 12)}</b></>}</small>
+   </div>
+   <Field label={'نمره رئیس برای ' + name + (direct ? ' (۰ تا ۹)' : ' (۰ تا ۳)')}>
+    <CoefficientInput value={value} maximum={maximum} fractionalLimit={28} busy={busy}
+     onChange={next => setValues(current => ({ ...current, [person.personId]: next }))}/>
+    {score != null && <small>امتیاز این فعالیت پس از تأیید: {num(score, 3)}</small>}
+   </Field>
+  </div>;
  })}</div>;
 }

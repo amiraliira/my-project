@@ -10,10 +10,10 @@ body.pak-enterprise .button{font-weight:500;border-radius:5px;transition:backgro
 body.pak-enterprise .button:hover{transform:none}
 body.pak-enterprise :is(.management-shell,.registration-shell){color-scheme:light;color:var(--pak-ink);font-family:PakUI,Tahoma,sans-serif;--muted:var(--pak-muted);--border:var(--pak-line)}
 body.pak-enterprise .management-shell:not(.modal-backdrop){background:var(--pak-background);min-height:100dvh;display:flex;flex-direction:column}
-body.pak-enterprise .management-header{background:#fff;border-bottom:1px solid var(--pak-line);color:var(--pak-ink);padding:12px 26px;min-height:74px;gap:18px}
+body.pak-enterprise .management-header{background:#fff;border-bottom:1px solid var(--pak-line);color:var(--pak-ink);padding:8px 22px;min-height:58px;gap:12px}
 body.pak-enterprise .management-brand{padding:0;border:0;background:transparent;color:var(--pak-ink);font-size:15px}
 body.pak-enterprise .pak-brand{color:var(--pak-ink);gap:11px;min-width:0}
-body.pak-enterprise .pak-brand.compact .pak-logo{width:40px;height:40px}
+body.pak-enterprise .pak-brand.compact .pak-logo{width:36px;height:36px}
 body.pak-enterprise .pak-brand-copy{min-width:0;display:block}
 body.pak-enterprise .pak-brand strong,body.pak-enterprise .pak-brand.compact strong{font-weight:500;font-size:16px;line-height:1.6;white-space:nowrap;color:var(--pak-ink);max-width:none}
 body.pak-enterprise .pak-brand small{display:block;font-size:11px;color:var(--pak-muted);line-height:1.6;margin-top:3px}
@@ -24,12 +24,12 @@ body.pak-enterprise .account-menu{background:#fff;border-color:var(--pak-line);b
 body.pak-enterprise .account-menu :is(b,button){color:#526b80}
 body.pak-enterprise .account-menu button:hover{background:#f0f5f9}
 body.pak-enterprise .management-layout{display:grid;grid-template-columns:202px minmax(0,1fr);align-items:start;flex:1;min-width:0}
-body.pak-enterprise .management-navigation{display:flex;flex-direction:column;gap:5px;padding:23px 13px;background:#192f45;border:0;min-width:0;min-height:calc(100dvh - 74px);position:sticky;top:0;align-self:stretch;overflow:visible}
+body.pak-enterprise .management-navigation{display:flex;flex-direction:column;gap:4px;padding:14px 12px;background:#192f45;border:0;min-width:0;min-height:calc(100dvh - 58px);position:sticky;top:0;align-self:stretch;overflow:visible}
 body.pak-enterprise .management-navigation>button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border:0;background:transparent;color:#c6d5e2;font-size:12px;font-weight:400;text-align:right;border-radius:5px;white-space:nowrap;min-height:42px}
 body.pak-enterprise .management-navigation>button:hover{background:#263f56;color:#fff}
 body.pak-enterprise .management-navigation>button.active{background:#30536f;color:#fff;box-shadow:inset -2px 0 #8db1cb}
 body.pak-enterprise .management-navigation svg{opacity:.8}
-body.pak-enterprise .management-content{min-width:0;width:100%;max-width:1600px;margin:0 auto;padding:25px 27px 32px;min-height:420px}
+body.pak-enterprise .management-content{min-width:0;width:100%;max-width:1600px;margin:0 auto;padding:17px 22px 26px;min-height:420px}
 body.pak-enterprise .management-footer{background:#f6f8fa;border-top:1px solid var(--pak-line);color:#6d8091;font-size:11px;padding:12px 25px;gap:12px;flex-wrap:wrap}
 body.pak-enterprise .release-notice{background:#f4eee1;border-color:#e6dac3;color:#78633f;border-radius:4px;font-size:11px}
 body.pak-enterprise .management-shell :is(.panel,.management-card,.registration-card,.stat-card,.settings-card,.report-card){background:var(--pak-paper);color:var(--pak-ink);border-color:var(--pak-line);border-radius:7px;box-shadow:0 1px 3px #18344904}
@@ -99,25 +99,85 @@ body.pak-enterprise .management-shell :is(.workflow-stage.current>b,.workflow-st
 body.pak-enterprise .management-shell :is(.toast,.info-banner){color:#456b57;background:#eaf4ed;border-color:#c5dbcd}
 body.pak-enterprise .management-shell .toast .icon-button{color:#5e7c67}
 /* Overview loads summaries; full lists and forms are mounted on demand. */
-body.pak-enterprise .management-workspace{display:grid;gap:20px;min-width:0}
-body.pak-enterprise .workspace-heading{display:flex;justify-content:space-between;align-items:center;gap:18px}
-body.pak-enterprise .workspace-heading h1{margin:3px 0 0}
+body.pak-enterprise .management-workspace{display:grid;gap:13px;min-width:0}
+body.pak-enterprise .workspace-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+body.pak-enterprise .workspace-heading h1{margin:0}
+body.pak-enterprise .workspace-identity{display:flex;align-items:center;gap:13px;min-width:0}
+body.pak-enterprise .workspace-overview-heading{
+  padding:15px 18px;min-height:82px;border-radius:12px;color:#fff;
+  background:radial-gradient(ellipse at 90% 0%,#2e5d80 0%,transparent 58%),#172f47;
+  box-shadow:0 5px 16px #142c4218;
+}
+body.pak-enterprise .management-shell .workspace-overview-heading :is(h1,.workspace-role,.workspace-status){color:#f3f7fb}
+body.pak-enterprise .workspace-overview-heading .workspace-role{color:#c2d7e8}
+body.pak-enterprise .workspace-identity-icon{
+  display:grid;place-items:center;flex:none;width:45px;height:45px;
+  border:1px solid #a6c2d65c;border-radius:11px;background:#ffffff15;color:#e8f3fc;
+}
+body.pak-enterprise .workspace-overview-heading .button.primary{background:#fff;border-color:#fff;color:#153d5b}
+body.pak-enterprise .workspace-overview-heading .button.primary:hover{background:#e2f0fb}
+body.pak-enterprise .workspace-overview-heading .button.secondary{
+  color:#edf7ff;background:#ffffff10;border-color:#8fb3d077;
+}
+body.pak-enterprise .workspace-overview-heading .button.secondary:hover,
+body.pak-enterprise .workspace-overview-heading .icon-button:hover{background:#ffffff22}
+body.pak-enterprise .workspace-overview-heading .icon-button{color:#e1edf7}
+body.pak-enterprise .workspace-heading-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px 14px;flex-wrap:wrap;min-width:0}
 body.pak-enterprise .workspace-role{color:#798d9e;font-size:11px}
-body.pak-enterprise .workspace-status{display:flex;align-items:center;gap:10px;min-height:29px;font-size:11px;color:#8a9aa8}
-body.pak-enterprise .workspace-status>div{margin-left:auto}
+body.pak-enterprise .workspace-status{display:flex;align-items:center;gap:7px;min-height:29px;font-size:11px;color:#8a9aa8}
+body.pak-enterprise .workspace-status>div:empty{display:none}
 body.pak-enterprise .workspace-status .text-button{font-weight:400}
-body.pak-enterprise .overview-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
-body.pak-enterprise .overview-metric{display:grid;gap:8px;background:#fff;border:1px solid var(--pak-line);border-radius:6px;text-align:right;padding:15px 16px;min-height:128px;color:#405d75}
-body.pak-enterprise .overview-metric>span{display:flex;gap:8px;align-items:center;font-size:12px;color:#657d91}
-body.pak-enterprise .overview-metric>span>svg{margin-left:auto;color:#8ca3b5}
-body.pak-enterprise .overview-metric>strong{font-size:31px;font-weight:500;color:#284963;line-height:1.4;min-height:44px}
-body.pak-enterprise .overview-metric>small{display:flex;gap:6px;align-items:center;font-size:11px;color:#8a9cab}
-body.pak-enterprise .overview-metric:hover{border-color:#aec6d9}
-body.pak-enterprise .overview-panels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:18px;align-items:stretch}
-body.pak-enterprise .overview-panels .panel{min-height:275px}
+body.pak-enterprise .overview-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+body.pak-enterprise .overview-metric{
+  --metric-color:#216293;--metric-tint:#eaf3fb;display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:11px;
+  background:#fff;border:1px solid var(--pak-line);border-radius:10px;text-align:right;
+  padding:11px 13px;min-height:92px;color:#203a51;box-shadow:0 2px 5px #1b395409;
+}
+body.pak-enterprise .overview-metric.metric-warning{--metric-color:#98601d;--metric-tint:#fcf2e2}
+body.pak-enterprise .overview-metric.metric-planned{--metric-color:#535fa1;--metric-tint:#eeeffa}
+body.pak-enterprise .overview-metric.metric-complete{--metric-color:#29745e;--metric-tint:#e8f5ee}
+body.pak-enterprise .overview-metric .overview-metric-icon{
+  display:grid;place-items:center;width:38px;height:38px;border-radius:10px;
+  background:var(--metric-tint);color:var(--metric-color);
+}
+body.pak-enterprise .overview-metric .overview-metric-copy{display:grid;gap:3px;font-size:12px;color:#526d82}
+body.pak-enterprise .overview-metric-copy strong{font-size:25px;font-weight:600;line-height:1.15;color:#19364e}
+body.pak-enterprise .overview-metric-arrow{color:#748da2}
+body.pak-enterprise .overview-metric:hover{border-color:var(--metric-color);background:#fbfdff}
+body.pak-enterprise .overview-metric:focus-visible{outline:2px solid var(--metric-color);outline-offset:2px}
+body.pak-enterprise .overview-panels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:12px;align-items:start}
+body.pak-enterprise .overview-side{display:grid;min-width:0;gap:10px}
+body.pak-enterprise .overview-panels :is(.overview-actions,.own-performance,.activity-report){
+  border-radius:11px;box-shadow:0 2px 9px #19375009;
+}
+body.pak-enterprise .overview-panels .activity-report-toggle>svg:first-child{
+  width:31px;height:31px;padding:7px;border-radius:8px;background:#eaf3fb;color:#216293;
+}
+body.pak-enterprise .overview-panels .activity-report-totals{
+  padding-inline:10px;background:#f5f8fb;border:1px solid #e5edf4;border-radius:8px;
+}
+body.pak-enterprise .overview-panels .activity-bar-track{
+  height:9px;border-radius:5px;background:#eaf0f5;
+}
+body.pak-enterprise .overview-panels .activity-bar-track i{
+  border-radius:5px;background:linear-gradient(90deg,#2a6187,#4d8ab4);
+}
+@media (max-width:600px){
+  body.pak-enterprise .workspace-overview-heading{padding:12px;align-items:flex-start;flex-wrap:wrap}
+  body.pak-enterprise .workspace-identity-icon{width:36px;height:36px}
+  body.pak-enterprise .overview-metric{gap:7px;padding-inline:8px}
+  body.pak-enterprise .overview-metric .overview-metric-icon{width:30px;height:30px}
+  body.pak-enterprise .overview-metric .overview-metric-copy{font-size:11px}
+  body.pak-enterprise .overview-metric-copy strong{font-size:22px}
+}
+body.pak-enterprise .overview-side .overview-modules>div{grid-template-columns:repeat(2,minmax(0,1fr))}
+body.pak-enterprise .overview-side .own-performance:not(.is-open){padding:12px 14px}
+body.pak-enterprise .overview-side .own-performance:not(.is-open) .performance-summary>div{min-width:108px;padding:4px 0}
+body.pak-enterprise .overview-panels .panel-head{padding:11px 14px}
 body.pak-enterprise .overview-panels .panel-head h2{font-size:14px}
 body.pak-enterprise .overview-panels .panel-head .text-button{font-size:11px;font-weight:400}
-body.pak-enterprise .overview-task{display:flex;align-items:center;width:100%;gap:10px;padding:14px 17px;text-align:right;background:#fff;border:0;border-top:1px solid #edf1f5;min-height:84px;color:#40617b}
+body.pak-enterprise .overview-task{display:flex;align-items:center;width:100%;gap:9px;padding:8px 14px;text-align:right;background:#fff;border:0;border-top:1px solid #edf1f5;min-height:56px;color:#40617b}
 body.pak-enterprise .overview-task>span:nth-child(2){min-width:0;flex:1}
 body.pak-enterprise .overview-task b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:13px;font-weight:400;line-height:1.85}
 body.pak-enterprise .overview-task small{display:block;color:#8396a5;font-size:11px;line-height:1.7}
@@ -131,7 +191,11 @@ body.pak-enterprise .overview-chart-row>i>b{display:block;height:100%;background
 body.pak-enterprise .overview-chart-row:first-child>i>b{background:#3c7197}
 body.pak-enterprise .overview-chart-row>strong{font-size:12px;font-weight:500;color:#506c83;text-align:left}
 body.pak-enterprise .overview-chart-caption{font-size:11px;color:#91a1ae;padding:12px 19px;border-top:1px solid #edf1f5;margin-top:6px}
-body.pak-enterprise .overview-modules{display:grid;gap:12px}
+body.pak-enterprise .overview-modules>summary{display:flex;align-items:center;gap:8px;min-height:39px;padding:4px 12px;border:1px solid var(--pak-line);border-radius:6px;background:#fff;color:#375a75;cursor:pointer;list-style:none;font-size:12px}
+body.pak-enterprise .overview-modules>summary::-webkit-details-marker{display:none}
+body.pak-enterprise .overview-modules>summary>svg:last-child{margin-inline-start:auto}
+body.pak-enterprise .overview-modules[open]>summary>svg:last-child{transform:rotate(-90deg)}
+body.pak-enterprise .overview-modules[open]>div{margin-top:8px}
 body.pak-enterprise .overview-modules>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
 body.pak-enterprise .overview-modules>div>button{display:flex;gap:12px;align-items:center;text-align:right;background:#fff;border:1px solid var(--pak-line);border-radius:6px;padding:15px 13px;color:#7193ae;min-width:0}
 body.pak-enterprise .overview-modules>div>button:hover{border-color:#a9c0d2;background:#fbfdfe}
@@ -187,8 +251,8 @@ body.pak-enterprise .compatibility-card{background:#fff;border-color:#d8e3ec;col
 body.pak-enterprise .compatibility-card :is(h1,p,li,b,small){color:#57738a}
 body.pak-enterprise .compatibility-versions>div{background:#f5f8fa;border-color:#dce6ed}
 body.pak-enterprise .compatibility-versions :is(dt,dd){color:#567b97}
-@media(max-width:1050px){body.pak-enterprise .management-layout{grid-template-columns:180px minmax(0,1fr)}body.pak-enterprise .management-content{padding:22px 20px}body.pak-enterprise .management-navigation{padding-inline:9px}body.pak-enterprise .management-navigation>button{font-size:11px;padding-inline:10px}body.pak-enterprise .overview-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}body.pak-enterprise .overview-panels{grid-template-columns:1fr}body.pak-enterprise .overview-modules>div{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:760px){body.pak-enterprise .management-layout{display:block}body.pak-enterprise .management-navigation{position:static;min-height:0;display:flex;flex-direction:row;overflow-x:auto;align-self:auto;padding:9px 12px;gap:5px;max-width:100%}body.pak-enterprise .management-navigation>button{width:auto;flex:none;padding:9px 11px;font-size:11px}body.pak-enterprise .management-content{padding:20px 13px 28px}body.pak-enterprise .management-header{padding:11px 14px;min-height:65px}body.pak-enterprise .pak-brand.compact strong{font-size:14px}body.pak-enterprise .pak-brand.compact .pak-logo{width:35px;height:35px}body.pak-enterprise .pak-brand small{font-size:10px}body.pak-enterprise .management-header-date{display:none}body.pak-enterprise .workspace-heading{flex-wrap:wrap;gap:13px}body.pak-enterprise .workspace-heading h1{font-size:22px}body.pak-enterprise .workspace-status{font-size:10px;gap:6px}body.pak-enterprise .overview-metric{padding:14px 12px;min-height:124px}body.pak-enterprise .overview-metric>span{font-size:11px}body.pak-enterprise .overview-metric>strong{font-size:28px}body.pak-enterprise .overview-modules>div>button{padding:13px 11px;gap:8px}body.pak-enterprise .overview-modules b{font-size:12px}body.pak-enterprise .management-card{padding:16px}body.pak-enterprise .registration-brand .pak-brand.compact strong{font-size:13px}body.pak-enterprise .registration-brand .pak-brand.compact .pak-logo{width:32px;height:32px}body.pak-enterprise .pak-login .login-form{background:#fff;border-color:#dce5ed;box-shadow:none;border-radius:8px}}
+@media(max-width:1050px){body.pak-enterprise .management-layout{grid-template-columns:180px minmax(0,1fr)}body.pak-enterprise .management-content{padding:16px 17px 24px}body.pak-enterprise .management-navigation{padding-inline:9px}body.pak-enterprise .management-navigation>button{font-size:11px;padding-inline:10px}body.pak-enterprise .overview-panels{grid-template-columns:1fr}body.pak-enterprise .overview-modules>div{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){body.pak-enterprise .management-layout{display:block}body.pak-enterprise .management-navigation{position:static;min-height:0;display:flex;flex-direction:row;overflow-x:auto;overscroll-behavior-inline:contain;align-self:auto;padding:7px 10px;gap:5px;max-width:100%}body.pak-enterprise .management-navigation>button{width:auto;flex:none;padding:9px 11px;font-size:11px}body.pak-enterprise .management-content{padding:12px 12px 23px}body.pak-enterprise .management-header{padding:11px 14px;min-height:65px}body.pak-enterprise .pak-brand.compact strong{font-size:14px}body.pak-enterprise .pak-brand.compact .pak-logo{width:35px;height:35px}body.pak-enterprise .pak-brand small{font-size:10px}body.pak-enterprise .management-header-date{display:none}body.pak-enterprise .workspace-heading{flex-wrap:wrap;gap:8px}body.pak-enterprise .workspace-heading-actions{justify-content:flex-start}body.pak-enterprise .workspace-heading h1{font-size:22px}body.pak-enterprise .workspace-status{font-size:10px;gap:6px}body.pak-enterprise .overview-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}body.pak-enterprise .overview-metric{padding:8px 10px;min-height:83px}body.pak-enterprise .overview-metric>span{font-size:11px}body.pak-enterprise .overview-metric>strong{font-size:24px}body.pak-enterprise .overview-modules>div>button{padding:13px 11px;gap:8px}body.pak-enterprise .overview-modules b{font-size:12px}body.pak-enterprise .management-card{padding:16px}body.pak-enterprise .registration-brand .pak-brand.compact strong{font-size:13px}body.pak-enterprise .registration-brand .pak-brand.compact .pak-logo{width:32px;height:32px}body.pak-enterprise .pak-login .login-form{background:#fff;border-color:#dce5ed;box-shadow:none;border-radius:8px}}
 @media(prefers-reduced-motion:reduce){body.pak-enterprise *{scroll-behavior:auto;transition:none}}
 /* Secondary operational text remains readable at the technician's existing sizes. */
 body.pak-enterprise{--pak-muted:#627588;--muted:#627588}
@@ -205,7 +269,9 @@ body.pak-enterprise .own-performance:not(.is-open) .performance-summary>div{disp
 body.pak-enterprise .own-performance:not(.is-open) .performance-summary b{font-size:23px}
 body.pak-enterprise .own-performance:not(.is-open) .performance-quick-period>span{display:none}
 body.pak-enterprise .own-performance:not(.is-open) .performance-summary>div{flex-direction:row}
-body.pak-enterprise .overview-panels .panel{min-height:180px}
+body.pak-enterprise .order-history-events{list-style:none;padding:0;margin:8px 0 0}
+body.pak-enterprise .order-history-events>li{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 14px;padding:8px 0;border-top:1px solid var(--pak-line)}
+body.pak-enterprise .order-history-events>li>p{flex-basis:100%;margin:0}
 body.pak-enterprise .management-shell :is(.action-panel,.history){background:#f5f8fb;border-color:#dce5ed;color:#527087}
 body.pak-enterprise :is(.management-shell,.registration-shell) .selected-line{color:#506e85;border-color:#dfe7ee}
 body.pak-enterprise :is(.management-shell,.registration-shell) .selected-line b{color:#4b7896;font-weight:500}
