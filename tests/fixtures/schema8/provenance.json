@@ -1,0 +1,23 @@
+{
+  "source": "Preserved prior PAK manual-Uvicorn release: schema 8 and original evidence guards",
+  "syntheticSchemaOnly": true,
+  "sha256": {
+    "postgresql-archive-guards.sql": "0611e82373c6f49e298fa123c5edefa24b9d9688cd5ec6b2be1adb875d21300d",
+    "postgresql-evidence-guards.sql": "c4a349c51e556533aeea0f5dde0999f190fe47383fb7c27317e6502f7f68b236",
+    "postgresql-ledger-guards.sql": "867c30be712447f2932b6fdd1a61621b71346679e21ff387c3769288a9083797",
+    "postgresql-oee-v1.sql": "a0560bdea2c42dda926c07b390d9e5ca74fe055f1fbdf4a79c6faaaa24d09d36",
+    "postgresql-pm-archive.sql": "39370fc5ff0146c7162208383e44bf1c7c7cde34a4e3f7441ca0d4d586e36267",
+    "postgresql-pm-guards.sql": "c458362c6b12a0059ca6519d06cb20c0af8f4e92261e410f4626a3cebe5e0cf5",
+    "postgresql-score-functions.sql": "9188c9c9ee2c8893771b7fb4aadd2c96f5992c3a9e3bb89d23bc5900b200dfda",
+    "postgresql-v6.sql": "7e7072e7a73a46e629d2a9f350f4634e6d2fefb0df10153ca0b82d827562444d",
+    "postgresql-v7.sql": "264e9970e7459b6c316164d951240b2edb7570c1427c2ee4462c31ac46d2624d",
+    "postgresql-v8.sql": "f34eb82c182128b6a751b77003966231b3af64d52e2f22a7703c88e82bb7cc7b",
+    "sqlite-archive-guards.sql": "47956835fee976a86743b184873302cd3411eeb2efca7b4739ecf0f8f4d6082f",
+    "sqlite-evidence-guards.sql": "49d0538323e5dd4ee8c40ced40483af87c0dd85eddf800604d6b02220d8f2ef8",
+    "sqlite-ledger-guards.sql": "e996aee981cc42957ee459b9c770e58bba6728ffbdb858eafdd4254dafa5f398",
+    "sqlite-pm-guards.sql": "3c510ffc884e85efb39e49c5fab2d426d00612985cd2f541a7b37b96040bef06",
+    "sqlite-v6.sql": "205cfd533f748f938253509abfd93b467f441f78e96855997021b5bd2f7eb9bd",
+    "sqlite-v7.sql": "7eec3c7ae88ce00a1880e895a39829af72ab36d67fc60d8ec0445c8b033287e4",
+    "sqlite-v8.sql": "5f74a7d30bf91b27d193ac257b3384016bbffd3331e883a5ba18b0be64ae4a87"
+  }
+}
