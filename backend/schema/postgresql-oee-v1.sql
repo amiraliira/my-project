@@ -1,4 +1,4 @@
--- Optional OEE module v1. This rc12 delivery enables it on core schema 10.
+-- Optional OEE module v1. Use the current release's core prerequisites.
 -- Run once in a transaction after a verified native backup. No existing rows modified.
 CREATE TABLE oee_module(version INTEGER PRIMARY KEY CHECK(version=1));
 CREATE TABLE oee_lines(

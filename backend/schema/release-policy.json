@@ -1,14 +1,32 @@
 {
   "protocol": 1,
-  "coreSchema": 10,
+  "coreSchema": 12,
   "optionalOeeSchema": 1,
   "databaseMigration": true,
-  "explicitUpgrades": ["postgresql-upgrade-8-to-9.sql", "postgresql-upgrade-9-to-10.sql"],
-  "maintenanceTools": ["tools/upgrade_core_schema.py", "tools/upgrade_review_schema.py"],
-  "sourceCoreSchema": 8,
+  "explicitUpgrades": [
+    "postgresql-upgrade-8-to-9.sql",
+    "postgresql-upgrade-9-to-10.sql",
+    "postgresql-upgrade-10-to-11.sql",
+    "postgresql-upgrade-11-to-12.sql"
+  ],
+  "maintenanceTools": [
+    "tools/upgrade_core_schema.py",
+    "tools/upgrade_review_schema.py",
+    "tools/upgrade_pm_routing.py",
+    "tools/upgrade_work_categories.py"
+  ],
+  "sourceCoreSchema": 11,
   "requiresStoppedWriters": true,
   "requiresVerifiedNativeBackup": true,
   "startupMigrates": false,
   "preservesExistingRows": true,
-  "optionalOeeMigration": false
+  "optionalOeeMigration": false,
+  "pmExecutionTeamPolicy": "explicit-responsible-supervisor-v1",
+  "workCategories": [
+    "PM",
+    "EM",
+    "CM",
+    "PROJECT",
+    "GENERAL"
+  ]
 }
