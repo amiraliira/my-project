@@ -1,16 +1,16 @@
 {
-  "applicationVersion": "2.0.0-rc.12",
-  "packageRevision": 3,
-  "updateDate": "2026-11-12",
-  "apiVersion": 7,
-  "coreSchemaVersion": 10,
+  "applicationVersion": "2.0.0-rc.13",
+  "packageRevision": 2,
+  "updateDate": "2026-11-22",
+  "apiVersion": 8,
+  "coreSchemaVersion": 12,
   "optionalOeeSchemaVersion": 1,
   "supportedSourceCoreSchemaVersions": [
-    8,
-    9,
-    10
+    10,
+    11,
+    12
   ],
-  "archiveRoot": "PAK-rc12",
+  "archiveRoot": "PAK-Project",
   "releaseStage": "locally-tested-candidate",
   "productionAccepted": false,
   "companyServerContacted": false,
@@ -24,19 +24,24 @@
   "requiresStoppedWriters": true,
   "requiresVerifiedNativeBackup": true,
   "explicitUpgrades": [
-    "postgresql-upgrade-8-to-9.sql",
-    "postgresql-upgrade-9-to-10.sql"
+    "postgresql-upgrade-10-to-11.sql",
+    "postgresql-upgrade-11-to-12.sql"
   ],
-  "newMigrationSinceRevision2": false,
   "entryPoint": "README.md",
-  "verification": "docs/operations-verification.json",
-  "gzipPairsVerified": 25,
+  "verification": "Local PostgreSQL, frontend build, and browser checks",
+  "gzipPairsVerified": 31,
   "builtFontsVerified": [
     "frontend/dist/assets/Vazirmatn-Regular-CtGL0YI-.woff2",
     "frontend/dist/assets/Vazirmatn-Medium-D86t5Axy.woff2",
     "frontend/dist/assets/Vazirmatn-SemiBold-26ZP1ILp.woff2"
   ],
-  "requiredR2CapabilitiesVerified": [
-    "em-downtime-drilldown"
+  "scope": "Management workspace and review controls, personnel hall drilldown, PM routing review and per-unit creation, and guided rc12 update",
+  "requiredCapabilities": [
+    "em-downtime-drilldown",
+    "pm-responsibility-cross-team",
+    "work-categories-v1",
+    "activity-reporting-v1",
+    "personnel-activity-drilldown",
+    "pm-routing-review"
   ]
 }
